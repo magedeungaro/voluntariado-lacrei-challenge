@@ -1,0 +1,73 @@
+[tool.poetry]
+name = "lacrei-saude-api"
+version = "0.1.0"
+description = "API REST para gerenciamento de profissionais de saúde e consultas - Desafio Lacrei Saúde"
+authors = ["Mage De Ungaro"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1"
+djangorestframework = "^3.15"
+psycopg2-binary = "^2.9"
+gunicorn = "^23.0"
+python-decouple = "^3.8"
+django-cors-headers = "^4.6"
+drf-spectacular = "^0.28"
+django-oauth-toolkit = "^3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+pytest-django = "^4.9"
+pytest-cov = "^6.0"
+black = "^24.10"
+isort = "^5.13"
+flake8 = "^7.1"
+mypy = "^1.13"
+django-stubs = "^5.1"
+djangorestframework-stubs = "^3.15"
+factory-boy = "^3.3"
+faker = "^33.1"
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip = ["migrations", ".venv"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "app.settings"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --cov=app --cov-report=term-missing --cov-report=html"
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+strict = true
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "app.settings"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
