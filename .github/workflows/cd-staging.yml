@@ -1,8 +1,8 @@
-name: CD - Deploy to Production
+name: CD - Deploy to Staging
 
 on:
   push:
-    branches: [release]
+    branches: [staging]
   workflow_dispatch:
     inputs:
       slot:
@@ -24,9 +24,9 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to AWS
+    name: Deploy to Staging
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: lacrei-saude
+          ECR_REPOSITORY: lacrei-saude-staging
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -67,7 +67,7 @@ jobs:
 
       - name: Deploy to EC2 via SSM
         env:
-          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID_STAGING }}
           SLOT: ${{ steps.slot.outputs.slot }}
         run: |
           # Deploy to the selected slot
@@ -91,7 +91,7 @@ jobs:
 
       - name: Run database migrations
         env:
-          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID_STAGING }}
         run: |
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
@@ -113,7 +113,7 @@ jobs:
       - name: Switch traffic (if enabled)
         if: ${{ github.event.inputs.switch_traffic != 'false' }}
         env:
-          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID_STAGING }}
           SLOT: ${{ steps.slot.outputs.slot }}
         run: |
           COMMAND_ID=$(aws ssm send-command \
@@ -135,7 +135,7 @@ jobs:
 
       - name: Health check
         env:
-          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID_STAGING }}
         run: |
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
