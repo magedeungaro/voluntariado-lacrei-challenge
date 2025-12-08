@@ -8,10 +8,10 @@ User = get_user_model()
 
 
 class ProfessionalAPITestCase(APITestCase):
-    """Base test case for Professional API tests."""
+    """Caso de teste base para testes da API de Profissionais."""
 
     def setUp(self):
-        """Set up test fixtures."""
+        """Configura os dados de teste."""
         self.user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
@@ -38,7 +38,7 @@ class ProfessionalAPITestCase(APITestCase):
         }
 
     def create_professional(self):
-        """Helper to create a professional with address and contacts."""
+        """Helper para criar um profissional com endereço e contatos."""
         professional = Professional.objects.create(
             social_name="Dr. João Santos",
             profession="Psicólogo",
@@ -67,22 +67,22 @@ class ProfessionalAPITestCase(APITestCase):
 
 
 class TestProfessionalList(ProfessionalAPITestCase):
-    """Tests for listing professionals (GET /api/v1/professionals/)."""
+    """Testes para listagem de profissionais (GET /api/v1/professionals/)."""
 
     def test_list_professionals_returns_200(self):
-        """Test that list endpoint returns 200 OK."""
+        """Testa que o endpoint de listagem retorna 200 OK."""
         response = self.client.get("/api/v1/professionals/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_professionals_returns_empty_list(self):
-        """Test that list returns empty list when no professionals exist."""
+        """Testa que a listagem retorna lista vazia quando não existem profissionais."""
         response = self.client.get("/api/v1/professionals/")
         data = response.json()
         self.assertEqual(data["count"], 0)
         self.assertEqual(data["results"], [])
 
     def test_list_professionals_returns_professionals(self):
-        """Test that list returns professionals when they exist."""
+        """Testa que a listagem retorna profissionais quando existem."""
         professional = self.create_professional()
         response = self.client.get("/api/v1/professionals/")
         data = response.json()
@@ -94,7 +94,7 @@ class TestProfessionalList(ProfessionalAPITestCase):
         self.assertEqual(data["results"][0]["profession"], professional.profession)
 
     def test_list_professionals_includes_address(self):
-        """Test that list returns professionals with address."""
+        """Testa que a listagem retorna profissionais com endereço."""
         self.create_professional()
         response = self.client.get("/api/v1/professionals/")
         data = response.json()
@@ -107,7 +107,7 @@ class TestProfessionalList(ProfessionalAPITestCase):
         self.assertEqual(address["zip_code"], "01310100")
 
     def test_list_professionals_includes_contacts(self):
-        """Test that list returns professionals with contacts."""
+        """Testa que a listagem retorna profissionais com contatos."""
         self.create_professional()
         response = self.client.get("/api/v1/professionals/")
         data = response.json()
@@ -120,10 +120,10 @@ class TestProfessionalList(ProfessionalAPITestCase):
 
 
 class TestProfessionalCreate(ProfessionalAPITestCase):
-    """Tests for creating professionals (POST /api/v1/professionals/)."""
+    """Testes para criação de profissionais (POST /api/v1/professionals/)."""
 
     def test_create_professional_returns_201(self):
-        """Test that create endpoint returns 201 Created."""
+        """Testa que o endpoint de criação retorna 201 Created."""
         response = self.client.post(
             "/api/v1/professionals/",
             data=self.professional_data,
@@ -132,7 +132,7 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_professional_returns_uuid(self):
-        """Test that create returns the professional with uuid."""
+        """Testa que a criação retorna o profissional com uuid."""
         response = self.client.post(
             "/api/v1/professionals/",
             data=self.professional_data,
@@ -144,7 +144,7 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         self.assertIsNotNone(data["uuid"])
 
     def test_create_professional_persists_data(self):
-        """Test that create persists the professional in the database."""
+        """Testa que a criação persiste o profissional no banco de dados."""
         response = self.client.post(
             "/api/v1/professionals/",
             data=self.professional_data,
@@ -157,7 +157,7 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         self.assertEqual(professional.profession, self.professional_data["profession"])
 
     def test_create_professional_persists_address(self):
-        """Test that create persists the address."""
+        """Testa que a criação persiste o endereço."""
         response = self.client.post(
             "/api/v1/professionals/",
             data=self.professional_data,
@@ -175,7 +175,7 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         self.assertEqual(address.zip_code, self.professional_data["address"]["zip_code"])
 
     def test_create_professional_persists_contacts(self):
-        """Test that create persists all contacts."""
+        """Testa que a criação persiste todos os contatos."""
         response = self.client.post(
             "/api/v1/professionals/",
             data=self.professional_data,
@@ -193,16 +193,16 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
 
 
 class TestProfessionalRetrieve(ProfessionalAPITestCase):
-    """Tests for retrieving a professional (GET /api/v1/professionals/{uuid}/)."""
+    """Testes para obter detalhes de um profissional (GET /api/v1/professionals/{uuid}/)."""
 
     def test_retrieve_professional_returns_200(self):
-        """Test that retrieve endpoint returns 200 OK."""
+        """Testa que o endpoint de detalhes retorna 200 OK."""
         professional = self.create_professional()
         response = self.client.get(f"/api/v1/professionals/{professional.uuid}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_retrieve_professional_returns_correct_data(self):
-        """Test that retrieve returns the correct professional data."""
+        """Testa que o endpoint retorna os dados corretos do profissional."""
         professional = self.create_professional()
         response = self.client.get(f"/api/v1/professionals/{professional.uuid}/")
         data = response.json()
@@ -212,7 +212,7 @@ class TestProfessionalRetrieve(ProfessionalAPITestCase):
         self.assertEqual(data["profession"], professional.profession)
 
     def test_retrieve_professional_includes_timestamps(self):
-        """Test that retrieve includes created_at and updated_at."""
+        """Testa que o endpoint inclui created_at e updated_at."""
         professional = self.create_professional()
         response = self.client.get(f"/api/v1/professionals/{professional.uuid}/")
         data = response.json()
@@ -223,7 +223,7 @@ class TestProfessionalRetrieve(ProfessionalAPITestCase):
         self.assertIsNotNone(data["updated_at"])
 
     def test_retrieve_professional_includes_address(self):
-        """Test that retrieve includes address."""
+        """Testa que o endpoint inclui o endereço."""
         professional = self.create_professional()
         response = self.client.get(f"/api/v1/professionals/{professional.uuid}/")
         data = response.json()
@@ -238,7 +238,7 @@ class TestProfessionalRetrieve(ProfessionalAPITestCase):
         self.assertEqual(address["zip_code"], "01310100")
 
     def test_retrieve_professional_includes_contacts(self):
-        """Test that retrieve includes contacts."""
+        """Testa que o endpoint inclui os contatos."""
         professional = self.create_professional()
         response = self.client.get(f"/api/v1/professionals/{professional.uuid}/")
         data = response.json()
@@ -248,10 +248,10 @@ class TestProfessionalRetrieve(ProfessionalAPITestCase):
 
 
 class TestProfessionalUpdate(ProfessionalAPITestCase):
-    """Tests for updating a professional (PUT /api/v1/professionals/{uuid}/)."""
+    """Testes para atualização de profissional (PUT /api/v1/professionals/{uuid}/)."""
 
     def test_update_professional_returns_200(self):
-        """Test that update endpoint returns 200 OK."""
+        """Testa que o endpoint de atualização retorna 200 OK."""
         professional = self.create_professional()
         response = self.client.put(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -261,7 +261,7 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_professional_updates_basic_fields(self):
-        """Test that update changes the professional's basic fields."""
+        """Testa que a atualização altera os campos básicos do profissional."""
         professional = self.create_professional()
         self.client.put(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -274,7 +274,7 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
         self.assertEqual(professional.profession, self.professional_data["profession"])
 
     def test_update_professional_updates_address(self):
-        """Test that update changes the professional's address."""
+        """Testa que a atualização altera o endereço do profissional."""
         professional = self.create_professional()
         self.client.put(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -290,7 +290,7 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
         self.assertEqual(address.zip_code, self.professional_data["address"]["zip_code"])
 
     def test_update_professional_updates_contacts(self):
-        """Test that update changes the professional's contacts."""
+        """Testa que a atualização altera os contatos do profissional."""
         professional = self.create_professional()
         self.client.put(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -307,7 +307,7 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
         self.assertIn("whatsapp", kinds)
 
     def test_update_professional_returns_updated_data(self):
-        """Test that update returns the updated professional data."""
+        """Testa que a atualização retorna os dados atualizados do profissional."""
         professional = self.create_professional()
         response = self.client.put(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -321,10 +321,10 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
 
 
 class TestProfessionalPartialUpdate(ProfessionalAPITestCase):
-    """Tests for partial update of a professional (PATCH /api/v1/professionals/{uuid}/)."""
+    """Testes para atualização parcial de profissional (PATCH /api/v1/professionals/{uuid}/)."""
 
     def test_partial_update_professional_returns_200(self):
-        """Test that partial update endpoint returns 200 OK."""
+        """Testa que o endpoint de atualização parcial retorna 200 OK."""
         professional = self.create_professional()
         response = self.client.patch(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -334,7 +334,7 @@ class TestProfessionalPartialUpdate(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_partial_update_professional_updates_fields(self):
-        """Test that partial update changes the specified fields."""
+        """Testa que a atualização parcial altera os campos especificados."""
         professional = self.create_professional()
         self.client.patch(
             f"/api/v1/professionals/{professional.uuid}/",
@@ -348,16 +348,16 @@ class TestProfessionalPartialUpdate(ProfessionalAPITestCase):
 
 
 class TestProfessionalDelete(ProfessionalAPITestCase):
-    """Tests for deleting a professional (DELETE /api/v1/professionals/{uuid}/)."""
+    """Testes para exclusão de profissional (DELETE /api/v1/professionals/{uuid}/)."""
 
     def test_delete_professional_returns_204(self):
-        """Test that delete endpoint returns 204 No Content."""
+        """Testa que o endpoint de exclusão retorna 204 No Content."""
         professional = self.create_professional()
         response = self.client.delete(f"/api/v1/professionals/{professional.uuid}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_professional_removes_from_database(self):
-        """Test that delete removes the professional from the database."""
+        """Testa que a exclusão remove o profissional do banco de dados."""
         professional = self.create_professional()
         uuid = professional.uuid
         self.client.delete(f"/api/v1/professionals/{uuid}/")
@@ -365,7 +365,7 @@ class TestProfessionalDelete(ProfessionalAPITestCase):
         self.assertFalse(Professional.objects.filter(uuid=uuid).exists())
 
     def test_delete_professional_cascades_to_address(self):
-        """Test that delete cascades to remove the address."""
+        """Testa que a exclusão remove o endereço em cascata."""
         professional = self.create_professional()
         professional_id = professional.id
         self.client.delete(f"/api/v1/professionals/{professional.uuid}/")
@@ -373,7 +373,7 @@ class TestProfessionalDelete(ProfessionalAPITestCase):
         self.assertFalse(Address.objects.filter(professional_id=professional_id).exists())
 
     def test_delete_professional_cascades_to_contacts(self):
-        """Test that delete cascades to remove the contacts."""
+        """Testa que a exclusão remove os contatos em cascata."""
         professional = self.create_professional()
         professional_id = professional.id
         self.client.delete(f"/api/v1/professionals/{professional.uuid}/")
@@ -382,10 +382,10 @@ class TestProfessionalDelete(ProfessionalAPITestCase):
 
 
 class TestProfessionalErrors(ProfessionalAPITestCase):
-    """Tests for error handling in Professional API."""
+    """Testes para tratamento de erros na API de Profissionais."""
 
     def test_create_professional_without_social_name_returns_400(self):
-        """Test that creating professional without social_name returns 400."""
+        """Testa que criar profissional sem social_name retorna 400."""
         data = self.professional_data.copy()
         del data["social_name"]
 
@@ -398,7 +398,7 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertIn("social_name", response.json())
 
     def test_create_professional_without_profession_returns_400(self):
-        """Test that creating professional without profession returns 400."""
+        """Testa que criar profissional sem profession retorna 400."""
         data = self.professional_data.copy()
         del data["profession"]
 
@@ -411,7 +411,7 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertIn("profession", response.json())
 
     def test_create_professional_without_address_returns_400(self):
-        """Test that creating professional without address returns 400."""
+        """Testa que criar profissional sem address retorna 400."""
         data = self.professional_data.copy()
         del data["address"]
 
@@ -424,7 +424,7 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertIn("address", response.json())
 
     def test_create_professional_without_contacts_returns_400(self):
-        """Test that creating professional without contacts returns 400."""
+        """Testa que criar profissional sem contacts retorna 400."""
         data = self.professional_data.copy()
         del data["contacts"]
 
@@ -437,7 +437,7 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertIn("contacts", response.json())
 
     def test_create_professional_with_empty_contacts_returns_400(self):
-        """Test that creating professional with empty contacts list returns 400."""
+        """Testa que criar profissional com lista de contatos vazia retorna 400."""
         data = self.professional_data.copy()
         data["contacts"] = []
 
@@ -450,9 +450,9 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertIn("contacts", response.json())
 
     def test_create_professional_with_invalid_zip_code_returns_400(self):
-        """Test that creating professional with invalid zip_code returns 400."""
+        """Testa que criar profissional com CEP inválido retorna 400."""
         data = self.professional_data.copy()
-        data["address"]["zip_code"] = "123"  # Should be 8 digits
+        data["address"]["zip_code"] = "123"  # Deveria ter 8 dígitos
 
         response = self.client.post(
             "/api/v1/professionals/",
@@ -462,13 +462,13 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_retrieve_nonexistent_professional_returns_404(self):
-        """Test that retrieving non-existent professional returns 404."""
+        """Testa que buscar profissional inexistente retorna 404."""
         fake_uuid = "00000000-0000-0000-0000-000000000000"
         response = self.client.get(f"/api/v1/professionals/{fake_uuid}/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_nonexistent_professional_returns_404(self):
-        """Test that updating non-existent professional returns 404."""
+        """Testa que atualizar profissional inexistente retorna 404."""
         fake_uuid = "00000000-0000-0000-0000-000000000000"
         response = self.client.put(
             f"/api/v1/professionals/{fake_uuid}/",
@@ -478,13 +478,13 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_nonexistent_professional_returns_404(self):
-        """Test that deleting non-existent professional returns 404."""
+        """Testa que excluir profissional inexistente retorna 404."""
         fake_uuid = "00000000-0000-0000-0000-000000000000"
         response = self.client.delete(f"/api/v1/professionals/{fake_uuid}/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_professional_with_invalid_contact_kind_returns_400(self):
-        """Test that creating professional with invalid contact kind returns 400."""
+        """Testa que criar profissional com tipo de contato inválido retorna 400."""
         data = self.professional_data.copy()
         data["contacts"] = [{"kind": "invalid_kind", "value": "test@test.com"}]
 
@@ -496,6 +496,6 @@ class TestProfessionalErrors(ProfessionalAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_retrieve_professional_with_invalid_uuid_returns_404(self):
-        """Test that retrieving with invalid UUID format returns 404."""
+        """Testa que buscar com formato de UUID inválido retorna 404."""
         response = self.client.get("/api/v1/professionals/invalid-uuid/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

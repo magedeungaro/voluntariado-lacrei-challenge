@@ -5,19 +5,19 @@ import django
 import pytest
 from django.conf import settings
 
-# Add the project root to the path
+# Adiciona o diretório raiz do projeto ao path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def pytest_configure():
-    """Configure Django settings for pytest."""
+    """Configura as settings do Django para o pytest."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
     django.setup()
 
 
 @pytest.fixture(autouse=True)
 def override_rest_framework_permissions(settings):
-    """Override REST_FRAMEWORK permissions for all tests."""
+    """Sobrescreve as permissões do REST_FRAMEWORK para todos os testes."""
     settings.REST_FRAMEWORK = {
         **settings.REST_FRAMEWORK,
         "DEFAULT_AUTHENTICATION_CLASSES": [
