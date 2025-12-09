@@ -14,7 +14,7 @@ terraform {
 
   # Remote state for staging
   backend "s3" {
-    bucket = "lacrei-terraform-state"
+    bucket = "lacrei-terraform-state-magedeungaro"
     key    = "staging/terraform.tfstate"
     region = "us-east-1"
   }

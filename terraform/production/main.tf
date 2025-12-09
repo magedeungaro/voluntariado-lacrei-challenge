@@ -14,7 +14,7 @@ terraform {
 
   # Remote state for production
   backend "s3" {
-    bucket = "lacrei-terraform-state"
+    bucket = "lacrei-terraform-state-magedeungaro"
     key    = "production/terraform.tfstate"
     region = "us-east-1"
   }
