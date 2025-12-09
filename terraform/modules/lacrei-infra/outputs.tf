@@ -18,6 +18,11 @@ output "rds_port" {
   value       = aws_db_instance.main.port
 }
 
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_vpc.main.id
+}
+
 # Judge SSM access credentials
 output "judge_access_key_id" {
   description = "Judge IAM user access key ID"

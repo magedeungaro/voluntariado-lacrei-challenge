@@ -1,16 +1,16 @@
 # RDS Subnet Group
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.project_name}-db-subnet-group"
+  name       = "${var.project_name}-${var.environment}-db-subnet-group"
   subnet_ids = aws_subnet.private[*].id
 
   tags = {
-    Name = "${var.project_name}-db-subnet-group"
+    Name = "${var.project_name}-${var.environment}-db-subnet-group"
   }
 }
 
 # RDS PostgreSQL Instance
 resource "aws_db_instance" "main" {
-  identifier = "${var.project_name}-db"
+  identifier = "${var.project_name}-${var.environment}-db"
 
   # Engine
   engine               = "postgres"
@@ -35,14 +35,14 @@ resource "aws_db_instance" "main" {
   storage_encrypted = true
 
   # Backup
-  backup_retention_period = 7
+  backup_retention_period = var.environment == "production" ? 7 : 1
   backup_window          = "03:00-04:00"
   maintenance_window     = "Mon:04:00-Mon:05:00"
 
   # Other settings
-  skip_final_snapshot       = var.environment != "prod"
-  final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-final-snapshot" : null
-  deletion_protection       = var.environment == "prod"
+  skip_final_snapshot       = var.environment != "production"
+  final_snapshot_identifier = var.environment == "production" ? "${var.project_name}-${var.environment}-final-snapshot" : null
+  deletion_protection       = var.environment == "production"
   multi_az                 = false # Set to true for production HA
 
   # Performance Insights (free tier)
@@ -50,6 +50,6 @@ resource "aws_db_instance" "main" {
   performance_insights_retention_period = 7
 
   tags = {
-    Name = "${var.project_name}-db"
+    Name = "${var.project_name}-${var.environment}-db"
   }
 }

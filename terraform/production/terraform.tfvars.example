@@ -1,0 +1,22 @@
+# Production environment terraform.tfvars
+# Copy to terraform.tfvars and fill in sensitive values
+
+aws_region   = "us-east-1"
+project_name = "lacrei-saude"
+
+# Instance type (t3.micro is free tier eligible)
+instance_type = "t3.micro"
+
+# Database
+db_name     = "lacrei_prod_db"
+db_user     = "lacrei_user"
+db_password = "CHANGE_ME_PRODUCTION_STRONG_PASSWORD"
+
+# Django (generate a secure key - different from staging!)
+django_secret_key = "CHANGE_ME_PRODUCTION_DJANGO_SECRET_KEY"
+
+# VPC CIDR
+vpc_cidr = "10.0.0.0/16"
+
+# Create judge user for challenge evaluation
+create_ssm_judge_user = true

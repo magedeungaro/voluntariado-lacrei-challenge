@@ -1,4 +1,4 @@
-# ECR Repository
+# ECR Repository (shared across environments, uses tags to differentiate)
 resource "aws_ecr_repository" "app" {
   name                 = var.project_name
   image_tag_mutability = "MUTABLE"
@@ -12,7 +12,7 @@ resource "aws_ecr_repository" "app" {
   }
 
   tags = {
-    Name = "${var.project_name}-ecr"
+    Name = "${var.project_name}-${var.environment}-ecr"
   }
 }
 

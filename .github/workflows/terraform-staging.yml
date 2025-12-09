@@ -1,14 +1,16 @@
-name: Terraform
+name: Terraform - Staging
 
 on:
   push:
-    branches: [main]
+    branches: [staging]
     paths:
-      - 'terraform/**'
+      - 'terraform/modules/**'
+      - 'terraform/staging/**'
   pull_request:
-    branches: [main]
+    branches: [staging]
     paths:
-      - 'terraform/**'
+      - 'terraform/modules/**'
+      - 'terraform/staging/**'
   workflow_dispatch:
     inputs:
       action:
@@ -23,19 +25,16 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  TF_VAR_aws_region: us-east-1
-  TF_VAR_environment: dev
-  TF_VAR_project_name: lacrei-saude
 
 jobs:
   terraform:
-    name: Terraform
+    name: Terraform Staging
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy' && 'production' || 'development' }}
+    environment: ${{ github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy' && 'staging' || 'development' }}
     
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/staging
 
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +53,8 @@ jobs:
 
       - name: Terraform Format
         id: fmt
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
+        working-directory: terraform
         continue-on-error: true
 
       - name: Terraform Init
@@ -68,8 +68,8 @@ jobs:
       - name: Terraform Plan
         id: plan
         env:
-          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD_STAGING }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY_STAGING }}
         run: terraform plan -no-color -out=tfplan
         continue-on-error: true
 
@@ -78,7 +78,8 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            const output = `#### Terraform Staging Environment 🌱
+            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
@@ -103,13 +104,23 @@ jobs:
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         env:
-          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD_STAGING }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY_STAGING }}
         run: terraform apply -auto-approve tfplan
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
         env:
-          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD_STAGING }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY_STAGING }}
         run: terraform destroy -auto-approve
+
+      - name: Output EC2 Instance ID
+        if: github.event.inputs.action == 'apply'
+        run: |
+          echo "============================================================"
+          echo "IMPORTANT: Add this to your GitHub Repository Secrets:"
+          echo ""
+          echo "Secret Name: EC2_INSTANCE_ID_STAGING"
+          echo "Secret Value: $(terraform output -raw ec2_instance_id)"
+          echo "============================================================"

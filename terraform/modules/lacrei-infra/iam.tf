@@ -1,6 +1,6 @@
 # IAM Role for EC2 (SSM access)
 resource "aws_iam_role" "ec2" {
-  name = "${var.project_name}-ec2-role"
+  name = "${var.project_name}-${var.environment}-ec2-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "ec2" {
   })
 
   tags = {
-    Name = "${var.project_name}-ec2-role"
+    Name = "${var.project_name}-${var.environment}-ec2-role"
   }
 }
 
@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm" {
 
 # Policy for EC2 to pull from ECR
 resource "aws_iam_role_policy" "ec2_ecr" {
-  name = "${var.project_name}-ec2-ecr-policy"
+  name = "${var.project_name}-${var.environment}-ec2-ecr-policy"
   role = aws_iam_role.ec2.id
 
   policy = jsonencode({
@@ -50,7 +50,7 @@ resource "aws_iam_role_policy" "ec2_ecr" {
 
 # Policy for EC2 to write CloudWatch logs
 resource "aws_iam_role_policy" "ec2_cloudwatch" {
-  name = "${var.project_name}-ec2-cloudwatch-policy"
+  name = "${var.project_name}-${var.environment}-ec2-cloudwatch-policy"
   role = aws_iam_role.ec2.id
 
   policy = jsonencode({
@@ -72,17 +72,17 @@ resource "aws_iam_role_policy" "ec2_cloudwatch" {
 
 # Instance Profile
 resource "aws_iam_instance_profile" "ec2" {
-  name = "${var.project_name}-ec2-instance-profile"
+  name = "${var.project_name}-${var.environment}-ec2-instance-profile"
   role = aws_iam_role.ec2.name
 }
 
-# IAM User for Judge (SSM access only)
+# IAM User for Judge (SSM access only) - only for production
 resource "aws_iam_user" "judge" {
   count = var.create_ssm_judge_user ? 1 : 0
-  name  = "${var.project_name}-judge"
+  name  = "${var.project_name}-${var.environment}-judge"
 
   tags = {
-    Name    = "${var.project_name}-judge"
+    Name    = "${var.project_name}-${var.environment}-judge"
     Purpose = "Challenge evaluation - SSM port forwarding access"
   }
 }
@@ -90,7 +90,7 @@ resource "aws_iam_user" "judge" {
 # Judge SSM policy (very limited - only port forwarding to specific instance)
 resource "aws_iam_user_policy" "judge_ssm" {
   count = var.create_ssm_judge_user ? 1 : 0
-  name  = "${var.project_name}-judge-ssm-policy"
+  name  = "${var.project_name}-${var.environment}-judge-ssm-policy"
   user  = aws_iam_user.judge[0].name
 
   policy = jsonencode({

@@ -34,6 +34,7 @@ DB_HOST=${db_host}
 DB_PORT=5432
 ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:3000
+ENVIRONMENT=${environment}
 EOF
 
 chmod 600 /opt/lacrei-saude/.env
@@ -206,4 +207,4 @@ rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 systemctl start nginx
 
 # Log completion
-echo "EC2 setup completed at $(date)" >> /var/log/user-data.log
+echo "EC2 setup completed at $(date) - Environment: ${environment}" >> /var/log/user-data.log

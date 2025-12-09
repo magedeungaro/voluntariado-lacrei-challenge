@@ -1,0 +1,130 @@
+name: Terraform - Production
+
+on:
+  push:
+    branches: [release]
+    paths:
+      - 'terraform/modules/**'
+      - 'terraform/production/**'
+  pull_request:
+    branches: [release]
+    paths:
+      - 'terraform/modules/**'
+      - 'terraform/production/**'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  terraform:
+    name: Terraform Production
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy' && 'production' || 'development' }}
+    
+    defaults:
+      run:
+        working-directory: terraform/production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+        working-directory: terraform
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        env:
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+        run: terraform plan -no-color -out=tfplan
+        continue-on-error: true
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const output = `#### Terraform Production Environment 🚀
+            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`terraform
+            ${{ steps.plan.outputs.stdout }}
+            \`\`\`
+            
+            </details>
+            
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Apply
+        if: github.event.inputs.action == 'apply'
+        env:
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy'
+        env:
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+        run: terraform destroy -auto-approve
+
+      - name: Output EC2 Instance ID
+        if: github.event.inputs.action == 'apply'
+        run: |
+          echo "============================================================"
+          echo "IMPORTANT: Add this to your GitHub Repository Secrets:"
+          echo ""
+          echo "Secret Name: EC2_INSTANCE_ID"
+          echo "Secret Value: $(terraform output -raw ec2_instance_id)"
+          echo "============================================================"
+          echo ""
+          echo "Judge credentials:"
+          echo "Access Key ID: $(terraform output -raw judge_access_key_id)"
+          echo "Secret Access Key: $(terraform output -raw judge_secret_access_key)"

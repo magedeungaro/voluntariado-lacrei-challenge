@@ -1,0 +1,19 @@
+# Staging environment terraform.tfvars
+# Copy to terraform.tfvars and fill in sensitive values
+
+aws_region   = "us-east-1"
+project_name = "lacrei-saude"
+
+# Instance type (t3.micro is free tier eligible)
+instance_type = "t3.micro"
+
+# Database
+db_name     = "lacrei_staging_db"
+db_user     = "lacrei_user"
+db_password = "CHANGE_ME_STAGING_PASSWORD"
+
+# Django (generate a secure key - different from production!)
+django_secret_key = "CHANGE_ME_STAGING_DJANGO_SECRET_KEY"
+
+# VPC CIDR (different from production to avoid conflicts)
+vpc_cidr = "10.1.0.0/16"

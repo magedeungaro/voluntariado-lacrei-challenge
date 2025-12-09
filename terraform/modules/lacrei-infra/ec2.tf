@@ -1,19 +1,3 @@
-# Get latest Amazon Linux 2023 AMI
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["al2023-ami-*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 # EC2 Instance
 resource "aws_instance" "app" {
   ami                    = data.aws_ami.amazon_linux.id
@@ -38,6 +22,7 @@ resource "aws_instance" "app" {
     db_password        = var.db_password
     django_secret_key  = var.django_secret_key
     project_name       = var.project_name
+    environment        = var.environment
   }))
 
   metadata_options {
@@ -47,7 +32,7 @@ resource "aws_instance" "app" {
   }
 
   tags = {
-    Name = "${var.project_name}-app"
+    Name = "${var.project_name}-${var.environment}-app"
   }
 
   depends_on = [
@@ -58,10 +43,10 @@ resource "aws_instance" "app" {
 
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "app" {
-  name              = "/ec2/${var.project_name}"
-  retention_in_days = 14
+  name              = "/ec2/${var.project_name}-${var.environment}"
+  retention_in_days = var.environment == "production" ? 30 : 7
 
   tags = {
-    Name = "${var.project_name}-logs"
+    Name = "${var.project_name}-${var.environment}-logs"
   }
 }

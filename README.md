@@ -19,25 +19,28 @@ API REST para gerenciamento de profissionais de saúde e consultas - Desafio Lac
 lacrei-2025-tl/
 ├── app/                      # Código Django
 │   ├── core/                 # App principal (health check, etc.)
-│   ├── profissionais/        # CRUD de profissionais de saúde
-│   ├── consultas/            # Gerenciamento de consultas
+│   ├── professionals/        # CRUD de profissionais de saúde
+│   ├── appointments/         # Gerenciamento de consultas
 │   ├── settings.py           # Configurações Django
 │   ├── urls.py               # URLs principais
 │   └── wsgi.py               # WSGI config
 ├── terraform/                # Infraestrutura como código
-│   ├── provider.tf
-│   ├── variables.tf
-│   ├── vpc.tf
-│   ├── security.tf
-│   ├── iam.tf
-│   ├── ecr.tf
-│   ├── rds.tf
-│   ├── ec2.tf
-│   └── outputs.tf
+│   ├── modules/              # Módulos reutilizáveis
+│   │   └── lacrei-infra/     # Módulo principal de infraestrutura
+│   ├── staging/              # Ambiente de staging
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── production/           # Ambiente de produção
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
 ├── .github/workflows/        # CI/CD pipelines
 │   ├── ci.yml                # Lint, test, build
-│   ├── cd.yml                # Deploy blue/green
-│   └── terraform.yml         # Infra provisioning
+│   ├── cd.yml                # Deploy produção (branch: release)
+│   ├── cd-staging.yml        # Deploy staging (branch: staging)
+│   ├── terraform-staging.yml # Infra staging
+│   └── terraform-production.yml # Infra produção
 ├── Dockerfile
 ├── docker-compose.yml        # Dev environment
 ├── pyproject.toml            # Poetry config
@@ -164,33 +167,57 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
 
 ### Arquitetura
 
-- **EC2**: Instância privada rodando Docker + nginx
-- **RDS**: PostgreSQL 16 (instância privada)
-- **ECR**: Registro de imagens Docker
+- **EC2**: Instância privada rodando Docker + nginx (uma por ambiente)
+- **RDS**: PostgreSQL 16 (instância privada por ambiente)
+- **ECR**: Registro de imagens Docker (um por ambiente)
 - **SSM**: Acesso seguro sem portas públicas
 - **Blue/Green**: Dois containers (8001/8002) com switch via nginx
+
+### Ambientes
+
+| Ambiente | Branch | Terraform | Workflow |
+|----------|--------|-----------|----------|
+| Staging | `staging` | `terraform/staging/` | `cd-staging.yml` |
+| Production | `release` | `terraform/production/` | `cd.yml` |
 
 ### Provisionar Infraestrutura
 
 ```bash
-cd terraform
-
-# Copie e configure as variáveis
+# Para STAGING:
+cd terraform/staging
 cp terraform.tfvars.example terraform.tfvars
 # Edite terraform.tfvars com seus valores
 
-# Inicialize Terraform
 terraform init
-
-# Planeje as mudanças
 terraform plan
-
-# Aplique (cria recursos)
 terraform apply
 
-# Para destruir após o demo
-terraform destroy
+# Anote o ec2_instance_id e adicione ao GitHub Secrets como EC2_INSTANCE_ID_STAGING
+
+# Para PRODUCTION:
+cd terraform/production
+cp terraform.tfvars.example terraform.tfvars
+# Edite terraform.tfvars com seus valores
+
+terraform init
+terraform plan
+terraform apply
+
+# Anote o ec2_instance_id e adicione ao GitHub Secrets como EC2_INSTANCE_ID
 ```
+
+### GitHub Secrets Necessários
+
+| Secret | Descrição |
+|--------|-----------|
+| `AWS_ACCESS_KEY_ID` | Credencial AWS para deploy |
+| `AWS_SECRET_ACCESS_KEY` | Credencial AWS para deploy |
+| `EC2_INSTANCE_ID_STAGING` | ID da instância EC2 de staging (output do Terraform) |
+| `EC2_INSTANCE_ID` | ID da instância EC2 de produção (output do Terraform) |
+| `DB_PASSWORD_STAGING` | Senha do banco de staging |
+| `DB_PASSWORD` | Senha do banco de produção |
+| `DJANGO_SECRET_KEY_STAGING` | Secret key Django para staging |
+| `DJANGO_SECRET_KEY` | Secret key Django para produção |
 
 ### Deploy Manual
 
@@ -336,13 +363,39 @@ develop (local) ──► staging (branch) ──► release (branch)
 
 ### Evolução para Produção
 
-Para escalar esta arquitetura para produção real, seria necessário:
+Para escalar esta arquitetura para produção real, seria necessário considerar:
 
 1. **Criar ALB** com dois Target Groups (blue/green)
 2. **Configurar Auto Scaling Groups** para cada Target Group
 3. **Atualizar workflows** para usar AWS CodeDeploy ou alternar ALB listeners
 4. **Adicionar CloudWatch Alarms** para rollback automático
 5. **Implementar canary deployments** (opcional) - tráfego gradual 10% → 50% → 100%
+
+#### Fase 2: Alta Escala (Kubernetes)
+Para workloads de alta demanda, considerar migrar para **Amazon EKS** (Kubernetes):
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Amazon EKS Cluster                        │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │                    Ingress Controller                       │ │
+│  │                  (ALB Ingress / Nginx)                      │ │
+│  └──────────────────────────┬─────────────────────────────────┘ │
+│                             │                                    │
+│  ┌──────────────────────────▼─────────────────────────────────┐ │
+│  │                      Service                                │ │
+│  └──────────────────────────┬─────────────────────────────────┘ │
+│                             │                                    │
+│  ┌──────────┬───────────┬───┴────┬───────────┬──────────┐      │
+│  │  Pod     │   Pod     │  Pod   │   Pod     │   Pod    │      │
+│  │ (app)   │  (app)   │ (app)  │  (app)   │  (app)   │      │
+│  └──────────┴───────────┴────────┴───────────┴──────────┘      │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │  HPA (Horizontal Pod Autoscaler) - escala baseado em CPU    ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ## Licença
 

@@ -1,6 +1,6 @@
 # Security Group for EC2 (NO public inbound - SSM only)
 resource "aws_security_group" "ec2" {
-  name        = "${var.project_name}-ec2-sg"
+  name        = "${var.project_name}-${var.environment}-ec2-sg"
   description = "Security group for EC2 instance - NO public access, SSM only"
   vpc_id      = aws_vpc.main.id
 
@@ -16,13 +16,13 @@ resource "aws_security_group" "ec2" {
   }
 
   tags = {
-    Name = "${var.project_name}-ec2-sg"
+    Name = "${var.project_name}-${var.environment}-ec2-sg"
   }
 }
 
 # Security Group for RDS
 resource "aws_security_group" "rds" {
-  name        = "${var.project_name}-rds-sg"
+  name        = "${var.project_name}-${var.environment}-rds-sg"
   description = "Security group for RDS PostgreSQL"
   vpc_id      = aws_vpc.main.id
 
@@ -43,7 +43,7 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name = "${var.project_name}-rds-sg"
+    Name = "${var.project_name}-${var.environment}-rds-sg"
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_vpc_endpoint" "ssm" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${var.project_name}-ssm-endpoint"
+    Name = "${var.project_name}-${var.environment}-ssm-endpoint"
   }
 }
 
@@ -70,7 +70,7 @@ resource "aws_vpc_endpoint" "ssmmessages" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${var.project_name}-ssmmessages-endpoint"
+    Name = "${var.project_name}-${var.environment}-ssmmessages-endpoint"
   }
 }
 
@@ -83,13 +83,13 @@ resource "aws_vpc_endpoint" "ec2messages" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${var.project_name}-ec2messages-endpoint"
+    Name = "${var.project_name}-${var.environment}-ec2messages-endpoint"
   }
 }
 
 # Security Group for VPC Endpoints
 resource "aws_security_group" "vpc_endpoints" {
-  name        = "${var.project_name}-vpc-endpoints-sg"
+  name        = "${var.project_name}-${var.environment}-vpc-endpoints-sg"
   description = "Security group for VPC endpoints"
   vpc_id      = aws_vpc.main.id
 
@@ -109,6 +109,6 @@ resource "aws_security_group" "vpc_endpoints" {
   }
 
   tags = {
-    Name = "${var.project_name}-vpc-endpoints-sg"
+    Name = "${var.project_name}-${var.environment}-vpc-endpoints-sg"
   }
 }
