@@ -46,5 +46,5 @@ module "lacrei_infra" {
   db_password           = var.db_password
   django_secret_key     = var.django_secret_key
   vpc_cidr              = var.vpc_cidr
-  create_ssm_judge_user = var.create_ssm_judge_user  # Judge user for challenge evaluation
+  create_ssm_judge_user = var.create_ssm_judge_user # Judge user for challenge evaluation
 }

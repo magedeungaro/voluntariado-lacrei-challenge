@@ -13,10 +13,10 @@ resource "aws_db_instance" "main" {
   identifier = "${var.project_name}-${var.environment}-db"
 
   # Engine
-  engine               = "postgres"
-  engine_version       = "16.4"
-  instance_class       = "db.t3.micro" # Free tier eligible
-  allocated_storage    = 20
+  engine                = "postgres"
+  engine_version        = "16.4"
+  instance_class        = "db.t3.micro" # Free tier eligible
+  allocated_storage     = 20
   max_allocated_storage = 100
 
   # Credentials
@@ -36,17 +36,17 @@ resource "aws_db_instance" "main" {
 
   # Backup
   backup_retention_period = var.environment == "production" ? 7 : 1
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "Mon:04:00-Mon:05:00"
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "Mon:04:00-Mon:05:00"
 
   # Other settings
   skip_final_snapshot       = var.environment != "production"
   final_snapshot_identifier = var.environment == "production" ? "${var.project_name}-${var.environment}-final-snapshot" : null
   deletion_protection       = var.environment == "production"
-  multi_az                 = false # Set to true for production HA
+  multi_az                  = false # Set to true for production HA
 
   # Performance Insights (free tier)
-  performance_insights_enabled = true
+  performance_insights_enabled          = true
   performance_insights_retention_period = 7
 
   tags = {

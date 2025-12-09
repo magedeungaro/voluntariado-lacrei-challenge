@@ -46,5 +46,5 @@ module "lacrei_infra" {
   db_password           = var.db_password
   django_secret_key     = var.django_secret_key
   vpc_cidr              = var.vpc_cidr
-  create_ssm_judge_user = false  # No judge user for staging
+  create_ssm_judge_user = false # No judge user for staging
 }

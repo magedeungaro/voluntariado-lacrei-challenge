@@ -43,5 +43,5 @@ variable "django_secret_key" {
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
-  default     = "10.1.0.0/16"  # Different CIDR from production
+  default     = "10.1.0.0/16" # Different CIDR from production
 }
