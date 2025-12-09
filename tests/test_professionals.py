@@ -153,7 +153,9 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         data = response.json()
 
         professional = Professional.objects.get(uuid=data["uuid"])
-        self.assertEqual(professional.social_name, self.professional_data["social_name"])
+        self.assertEqual(
+            professional.social_name, self.professional_data["social_name"]
+        )
         self.assertEqual(professional.profession, self.professional_data["profession"])
 
     def test_create_professional_persists_address(self):
@@ -172,7 +174,9 @@ class TestProfessionalCreate(ProfessionalAPITestCase):
         self.assertEqual(address.number, self.professional_data["address"]["number"])
         self.assertEqual(address.city, self.professional_data["address"]["city"])
         self.assertEqual(address.state, self.professional_data["address"]["state"])
-        self.assertEqual(address.zip_code, self.professional_data["address"]["zip_code"])
+        self.assertEqual(
+            address.zip_code, self.professional_data["address"]["zip_code"]
+        )
 
     def test_create_professional_persists_contacts(self):
         """Testa que a criação persiste todos os contatos."""
@@ -270,7 +274,9 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
         )
 
         professional.refresh_from_db()
-        self.assertEqual(professional.social_name, self.professional_data["social_name"])
+        self.assertEqual(
+            professional.social_name, self.professional_data["social_name"]
+        )
         self.assertEqual(professional.profession, self.professional_data["profession"])
 
     def test_update_professional_updates_address(self):
@@ -287,7 +293,9 @@ class TestProfessionalUpdate(ProfessionalAPITestCase):
 
         self.assertEqual(address.street, self.professional_data["address"]["street"])
         self.assertEqual(address.city, self.professional_data["address"]["city"])
-        self.assertEqual(address.zip_code, self.professional_data["address"]["zip_code"])
+        self.assertEqual(
+            address.zip_code, self.professional_data["address"]["zip_code"]
+        )
 
     def test_update_professional_updates_contacts(self):
         """Testa que a atualização altera os contatos do profissional."""
@@ -343,7 +351,9 @@ class TestProfessionalPartialUpdate(ProfessionalAPITestCase):
         )
 
         professional.refresh_from_db()
-        self.assertEqual(professional.social_name, self.professional_data["social_name"])
+        self.assertEqual(
+            professional.social_name, self.professional_data["social_name"]
+        )
         self.assertEqual(professional.profession, self.professional_data["profession"])
 
 
@@ -370,7 +380,9 @@ class TestProfessionalDelete(ProfessionalAPITestCase):
         professional_id = professional.id
         self.client.delete(f"/api/v1/professionals/{professional.uuid}/")
 
-        self.assertFalse(Address.objects.filter(professional_id=professional_id).exists())
+        self.assertFalse(
+            Address.objects.filter(professional_id=professional_id).exists()
+        )
 
     def test_delete_professional_cascades_to_contacts(self):
         """Testa que a exclusão remove os contatos em cascata."""
@@ -378,7 +390,9 @@ class TestProfessionalDelete(ProfessionalAPITestCase):
         professional_id = professional.id
         self.client.delete(f"/api/v1/professionals/{professional.uuid}/")
 
-        self.assertFalse(Contact.objects.filter(professional_id=professional_id).exists())
+        self.assertFalse(
+            Contact.objects.filter(professional_id=professional_id).exists()
+        )
 
 
 class TestProfessionalErrors(ProfessionalAPITestCase):

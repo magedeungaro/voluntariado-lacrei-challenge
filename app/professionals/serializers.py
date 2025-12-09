@@ -62,7 +62,9 @@ class ProfessionalSerializer(serializers.ModelSerializer):
         """Customiza a representação para retornar address como objeto único."""
         representation = super().to_representation(instance)
         addresses = instance.addresses.all()
-        representation["address"] = AddressSerializer(addresses.first()).data if addresses.exists() else None
+        representation["address"] = (
+            AddressSerializer(addresses.first()).data if addresses.exists() else None
+        )
         return representation
 
 
