@@ -59,12 +59,12 @@ media/
 .docker/
 
 # Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/*.tfvars
-terraform/.terraform.lock.hcl
-!terraform/*.tfvars.example
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+!*.tfvars.example
 
 # OS
 .DS_Store
