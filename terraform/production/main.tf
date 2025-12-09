@@ -13,11 +13,11 @@ terraform {
   }
 
   # Remote state for production
-  # backend "s3" {
-  #   bucket = "lacrei-terraform-state"
-  #   key    = "production/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket = "lacrei-terraform-state"
+    key    = "production/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {
