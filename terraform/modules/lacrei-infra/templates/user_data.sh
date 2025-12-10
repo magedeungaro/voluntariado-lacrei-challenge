@@ -1,70 +1,72 @@
 #!/bin/bash
-set -ex
+set -e
 
-# Setup logging
+# Setup logging - redirect all output to log file and console
 exec > >(tee /var/log/user-data.log) 2>&1
-LOG_FILE="/var/log/user-data.log"
 
-log() {
-    echo "[$$(date '+%Y-%m-%d %H:%M:%S')] $$1"
-}
-
-log "=========================================="
-log "Starting user-data script execution"
-log "Environment: ${environment}"
-log "=========================================="
+echo "=========================================="
+echo "Starting user-data script execution"
+echo "Environment: ${environment}"
+echo "Timestamp: $(date)"
+echo "=========================================="
 
 # Ensure SSM agent is installed and running (required for AL2023)
-log "Installing SSM agent..."
-dnf install -y amazon-ssm-agent 2>&1 || log "SSM agent install failed with exit code $$?"
-log "Enabling SSM agent..."
-systemctl enable amazon-ssm-agent 2>&1 || log "SSM enable failed"
-log "Starting SSM agent..."
-systemctl start amazon-ssm-agent 2>&1 || log "SSM start failed"
-log "SSM agent status:"
+echo "Installing SSM agent..."
+dnf install -y amazon-ssm-agent
+echo "Enabling SSM agent..."
+systemctl enable amazon-ssm-agent
+echo "Starting SSM agent..."
+systemctl start amazon-ssm-agent
+echo "Waiting for SSM agent to start..."
+sleep 10
+echo "SSM agent status:"
 systemctl status amazon-ssm-agent --no-pager || true
-log "SSM agent installation complete"
+echo "SSM agent installation complete"
 
 # Test network connectivity to SSM endpoints
-log "Testing connectivity to SSM endpoints..."
-curl -s -o /dev/null -w "%%{http_code}" https://ssm.${aws_region}.amazonaws.com/ || log "Cannot reach ssm endpoint"
-curl -s -o /dev/null -w "%%{http_code}" https://ssmmessages.${aws_region}.amazonaws.com/ || log "Cannot reach ssmmessages endpoint"
-curl -s -o /dev/null -w "%%{http_code}" https://ec2messages.${aws_region}.amazonaws.com/ || log "Cannot reach ec2messages endpoint"
-log "Connectivity test complete"
+echo "Testing connectivity to SSM endpoints..."
+echo "Testing ssm endpoint..."
+curl -v https://ssm.${aws_region}.amazonaws.com/ 2>&1 | head -20 || echo "Cannot reach ssm endpoint"
+echo "Testing ssmmessages endpoint..."
+curl -v https://ssmmessages.${aws_region}.amazonaws.com/ 2>&1 | head -20 || echo "Cannot reach ssmmessages endpoint"
+echo "Testing ec2messages endpoint..."
+curl -v https://ec2messages.${aws_region}.amazonaws.com/ 2>&1 | head -20 || echo "Cannot reach ec2messages endpoint"
+echo "Connectivity test complete"
 
 # Check instance metadata
-log "Testing IMDS connectivity..."
-TOKEN=$$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") || log "Failed to get IMDS token"
-curl -s -H "X-aws-ec2-metadata-token: $$TOKEN" http://169.254.169.254/latest/meta-data/instance-id || log "Failed to get instance-id from IMDS"
-log "IMDS test complete"
+echo "Testing IMDS connectivity..."
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+echo "Instance ID: $INSTANCE_ID"
+echo "IMDS test complete"
 
 # Update system
-log "Updating system packages..."
+echo "Updating system packages..."
 dnf update -y
 
 # Install Docker
-log "Installing Docker..."
+echo "Installing Docker..."
 dnf install -y docker
 systemctl enable docker
 systemctl start docker
-log "Docker installed and started"
+echo "Docker installed and started"
 
 # Install nginx
-log "Installing nginx..."
+echo "Installing nginx..."
 dnf install -y nginx
 systemctl enable nginx
-log "Nginx installed"
+echo "Nginx installed"
 
 # Install AWS CLI (for ECR login)
-log "Installing AWS CLI..."
+echo "Installing AWS CLI..."
 dnf install -y aws-cli
-log "AWS CLI installed"
+echo "AWS CLI installed"
 
 # Add ec2-user to docker group
 usermod -aG docker ec2-user
 
 # Create app directory
-log "Creating app directory..."
+echo "Creating app directory..."
 mkdir -p /opt/lacrei-saude
 cd /opt/lacrei-saude
 
@@ -249,17 +251,18 @@ chmod +x /usr/local/bin/run-migrations.sh
 rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
 # Start nginx
-log "Starting nginx..."
+echo "Starting nginx..."
 systemctl start nginx
-log "Nginx started"
+echo "Nginx started"
 
 # Final SSM agent check
-log "Final SSM agent status check..."
+echo "Final SSM agent status check..."
 systemctl status amazon-ssm-agent --no-pager || true
-log "SSM agent logs:"
+echo "SSM agent logs:"
 journalctl -u amazon-ssm-agent --no-pager -n 50 || true
 
-log "=========================================="
-log "EC2 setup completed successfully!"
-log "Environment: ${environment}"
-log "=========================================="
+echo "=========================================="
+echo "EC2 setup completed successfully!"
+echo "Environment: ${environment}"
+echo "Timestamp: $(date)"
+echo "=========================================="
