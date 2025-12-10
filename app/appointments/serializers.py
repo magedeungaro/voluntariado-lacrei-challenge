@@ -28,7 +28,7 @@ class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer[Appointment]):
-    """Serializador para Consulta com detalhes do Profissional."""""
+    """Serializador para Consulta com detalhes do Profissional."""
 
     professional = ProfessionalSerializer(read_only=True)
 
