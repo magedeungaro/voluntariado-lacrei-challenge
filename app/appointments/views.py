@@ -1,5 +1,7 @@
+from django.db.models import QuerySet
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
+from rest_framework.request import Request
 
 from .models import Appointment
 from .serializers import AppointmentDetailSerializer, AppointmentSerializer
@@ -41,7 +43,7 @@ from .serializers import AppointmentDetailSerializer, AppointmentSerializer
         description="Exclui uma consulta.",
     ),
 )
-class AppointmentViewSet(viewsets.ModelViewSet):
+class AppointmentViewSet(viewsets.ModelViewSet[Appointment]):
     """
     ViewSet para operações CRUD de Consultas.
 
@@ -51,13 +53,13 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.select_related("professional").all()
     lookup_field = "uuid"
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[serializers.ModelSerializer[Appointment]]:
         """Usa serializador detalhado para retrieve, list usa básico."""
         if self.action in ["retrieve", "list"]:
             return AppointmentDetailSerializer
         return AppointmentSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Appointment]:
         """Filtra por professional_uuid se fornecido."""
         queryset = super().get_queryset()
         professional_uuid = self.request.query_params.get("professional_uuid")

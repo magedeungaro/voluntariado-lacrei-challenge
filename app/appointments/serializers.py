@@ -6,7 +6,7 @@ from app.professionals.serializers import ProfessionalSerializer
 from .models import Appointment
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
+class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
     """Serializador para o modelo de Consulta."""
 
     professional_uuid = serializers.SlugRelatedField(
@@ -27,8 +27,8 @@ class AppointmentSerializer(serializers.ModelSerializer):
         read_only_fields = ["uuid", "created_at", "updated_at"]
 
 
-class AppointmentDetailSerializer(serializers.ModelSerializer):
-    """Serializador para Consulta com detalhes do Profissional."""
+class AppointmentDetailSerializer(serializers.ModelSerializer[Appointment]):
+    """Serializador para Consulta com detalhes do Profissional."""""
 
     professional = ProfessionalSerializer(read_only=True)
 

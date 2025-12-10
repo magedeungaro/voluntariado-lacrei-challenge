@@ -31,5 +31,5 @@ class Appointment(models.Model):
         verbose_name_plural = "Consultas"
         ordering = ["-date"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Consulta com {self.professional.social_name} em {self.date}"

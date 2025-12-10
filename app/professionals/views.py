@@ -1,5 +1,7 @@
+from typing import type_check_only
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
 
 from .models import Professional
 from .serializers import ProfessionalDetailSerializer, ProfessionalSerializer
@@ -31,7 +33,7 @@ from .serializers import ProfessionalDetailSerializer, ProfessionalSerializer
         description="Exclui um profissional de saúde.",
     ),
 )
-class ProfessionalViewSet(viewsets.ModelViewSet):
+class ProfessionalViewSet(viewsets.ModelViewSet[Professional]):
     """
     ViewSet para operações CRUD de Profissionais de Saúde.
 
@@ -43,7 +45,7 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
     serializer_class = ProfessionalSerializer
     lookup_field = "uuid"
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[serializers.ModelSerializer[Professional]]:
         """Usa serializador detalhado para retrieve."""
         if self.action == "retrieve":
             return ProfessionalDetailSerializer

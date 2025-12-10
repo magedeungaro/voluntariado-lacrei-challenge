@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework.exceptions import ValidationError
 
 from .models import Address, Contact, Professional
@@ -7,9 +9,9 @@ class ProfessionalService:
     """Service layer para operações de Profissional."""
 
     @staticmethod
-    def validate(data):
+    def validate(data: dict[str, Any]) -> None:
         """Valida dados do profissional."""
-        errors = {}
+        errors: dict[str, list[str]] = {}
 
         if not data.get("social_name"):
             errors["social_name"] = ["Nome social é obrigatório."]
@@ -28,7 +30,7 @@ class ProfessionalService:
             raise ValidationError(errors)
 
     @staticmethod
-    def create(validated_data):
+    def create(validated_data: dict[str, Any]) -> Professional:
         """Cria profissional com endereço e contatos."""
         ProfessionalService.validate(validated_data)
 
@@ -45,7 +47,7 @@ class ProfessionalService:
         return professional
 
     @staticmethod
-    def update(instance, validated_data):
+    def update(instance: Professional, validated_data: dict[str, Any]) -> Professional:
         """Atualiza profissional com endereço e contatos."""
         ProfessionalService.validate(validated_data)
 

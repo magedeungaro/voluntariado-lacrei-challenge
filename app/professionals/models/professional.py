@@ -30,5 +30,5 @@ class Professional(models.Model):
         verbose_name_plural = "Profissionais"
         ordering = ["social_name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.social_name} - {self.profession}"

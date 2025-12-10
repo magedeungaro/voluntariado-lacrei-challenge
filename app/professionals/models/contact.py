@@ -37,5 +37,5 @@ class Contact(models.Model):
         verbose_name_plural = "Contatos"
         ordering = ["kind"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.get_kind_display()}: {self.value}"

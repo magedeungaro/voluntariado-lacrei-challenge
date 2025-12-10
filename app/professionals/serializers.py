@@ -1,10 +1,12 @@
+from typing import Any
+
 from rest_framework import serializers
 
 from .models import Address, Contact, Professional
 from .services import ProfessionalService
 
 
-class AddressSerializer(serializers.ModelSerializer):
+class AddressSerializer(serializers.ModelSerializer[Address]):
     """Serializador para o modelo de Endereço."""
 
     class Meta:
@@ -20,7 +22,7 @@ class AddressSerializer(serializers.ModelSerializer):
         ]
 
 
-class ContactSerializer(serializers.ModelSerializer):
+class ContactSerializer(serializers.ModelSerializer[Contact]):
     """Serializador para o modelo de Contato."""
 
     class Meta:
@@ -31,7 +33,7 @@ class ContactSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProfessionalSerializer(serializers.ModelSerializer):
+class ProfessionalSerializer(serializers.ModelSerializer[Professional]):
     """Serializador para o modelo de Profissional de Saúde (lista e escrita)."""
 
     social_name = serializers.CharField(max_length=255, required=True)
@@ -50,17 +52,19 @@ class ProfessionalSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["uuid"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> Professional:
         """Delega criação para o service."""
         return ProfessionalService.create(validated_data)
 
-    def update(self, instance, validated_data):
+    def update(
+        self, instance: Professional, validated_data: dict[str, Any]
+    ) -> Professional:
         """Delega atualização para o service."""
         return ProfessionalService.update(instance, validated_data)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Professional) -> dict[str, Any]:
         """Customiza a representação para retornar address como objeto único."""
-        representation = super().to_representation(instance)
+        representation: dict[str, Any] = super().to_representation(instance)
         addresses = instance.addresses.all()
         representation["address"] = (
             AddressSerializer(addresses.first()).data if addresses.exists() else None

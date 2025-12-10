@@ -131,9 +131,9 @@ REST_FRAMEWORK = {
 
 # Add browsable API in debug mode
 if DEBUG:
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"].append(
-        "rest_framework.renderers.BrowsableAPIRenderer"
-    )
+    renderers = REST_FRAMEWORK.get("DEFAULT_RENDERER_CLASSES")
+    if isinstance(renderers, list):
+        renderers.append("rest_framework.renderers.BrowsableAPIRenderer")
 
 # DRF Spectacular (OpenAPI/Swagger)
 SPECTACULAR_SETTINGS = {

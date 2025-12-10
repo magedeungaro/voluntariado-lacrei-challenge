@@ -15,7 +15,7 @@ resource "aws_instance" "app" {
 
   user_data = base64encode(templatefile("${path.module}/templates/user_data.sh", {
     aws_region         = var.aws_region
-    ecr_repository_url = aws_ecr_repository.app.repository_url
+    ecr_repository_url = local.ecr_repository_url
     db_host            = aws_db_instance.main.address
     db_name            = var.db_name
     db_user            = var.db_user
