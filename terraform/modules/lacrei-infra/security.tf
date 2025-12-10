@@ -1,10 +1,26 @@
-# Security Group for EC2 (NO public inbound - SSM only)
+# Security Group for EC2
 resource "aws_security_group" "ec2" {
   name        = "${var.project_name}-${var.environment}-ec2-sg"
-  description = "Security group for EC2 instance - NO public access, SSM only"
+  description = "Security group for EC2 instance"
   vpc_id      = aws_vpc.main.id
 
-  # NO inbound rules - all access via SSM Session Manager
+  # Allow HTTP from internet for API access
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP from internet"
+  }
+
+  # Allow HTTPS from internet
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS from internet"
+  }
 
   # Outbound: allow all (needed for SSM, ECR, updates)
   egress {

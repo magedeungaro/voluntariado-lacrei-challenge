@@ -246,22 +246,32 @@ aws ssm send-command \
   --parameters 'commands=["sudo /usr/local/bin/switch-backend.sh blue"]'
 ```
 
-### Acesso do Avaliador (SSM Port Forwarding)
+### Acesso à API
 
-```bash
-# Instale AWS CLI e session-manager-plugin
+**⚠️ Nota sobre Arquitetura de Rede:**
 
-# Configure as credenciais fornecidas
-aws configure
+A API está implantada em uma **instância EC2 com IP público** para facilitar a avaliação do desafio. Em um ambiente de produção real, a arquitetura recomendada seria:
 
-# Inicie port forwarding
-aws ssm start-session \
-  --target <INSTANCE_ID> \
-  --document-name AWS-StartPortForwardingSession \
-  --parameters '{"portNumber":["80"],"localPortNumber":["8080"]}'
+- **Application Load Balancer (ALB)** na camada pública
+- **Instâncias EC2 em subnets privadas** (sem IPs públicos)
+- **Acesso via ALB com SSL/TLS** (HTTPS)
+- **WAF (Web Application Firewall)** para proteção adicional
 
-# Acesse em http://localhost:8080
+Esta simplificação foi adotada por **razões de custo** (~$20-25/mês para ALB + certificado SSL), mas a infraestrutura está preparada para migração para ALB quando necessário (basta descomentar o módulo ALB no Terraform).
+
+**URL da API em produção:**
 ```
+http://<PUBLIC_IP>/api/v1/
+```
+
+O IP público é fornecido como output do Terraform após o deploy.
+
+**Endpoints disponíveis:**
+- `GET /api/v1/health/` - Health check
+- `GET /api/v1/professionals/` - Lista profissionais
+- `POST /api/v1/professionals/` - Cria profissional
+- `GET /api/v1/appointments/` - Lista consultas
+- `POST /api/v1/appointments/` - Cria consulta
 
 ## Segurança
 

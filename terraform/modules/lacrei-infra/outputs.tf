@@ -8,6 +8,16 @@ output "ec2_instance_id" {
   value       = aws_instance.app.id
 }
 
+output "ec2_public_ip" {
+  description = "EC2 public IP address"
+  value       = aws_instance.app.public_ip
+}
+
+output "api_url" {
+  description = "Public API URL"
+  value       = "http://${aws_instance.app.public_ip}"
+}
+
 output "rds_endpoint" {
   description = "RDS PostgreSQL endpoint"
   value       = aws_db_instance.main.address
