@@ -2,7 +2,6 @@
 Django settings for Lacrei Saúde API.
 """
 
-import os
 from pathlib import Path
 
 from decouple import Csv, config
