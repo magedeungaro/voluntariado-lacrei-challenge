@@ -18,21 +18,8 @@ output "vpc_id" {
   value       = module.lacrei_infra.vpc_id
 }
 
-# Judge SSM access credentials
-output "judge_access_key_id" {
-  description = "Judge IAM user access key ID"
-  value       = module.lacrei_infra.judge_access_key_id
-  sensitive   = true
-}
-
-output "judge_secret_access_key" {
-  description = "Judge IAM user secret access key"
-  value       = module.lacrei_infra.judge_secret_access_key
-  sensitive   = true
-}
-
 output "ssm_port_forward_command" {
-  description = "Command for judge to create SSM port forwarding session"
+  description = "Command to create SSM port forwarding session"
   value       = module.lacrei_infra.ssm_port_forward_command
 }
 
@@ -51,9 +38,5 @@ output "github_secrets_reminder" {
     Secret Name: EC2_INSTANCE_ID
     Secret Value: ${module.lacrei_infra.ec2_instance_id}
     ============================================================
-    
-    To get judge credentials, run:
-    terraform output -raw judge_access_key_id
-    terraform output -raw judge_secret_access_key
   EOT
 }

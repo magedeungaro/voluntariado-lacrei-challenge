@@ -47,12 +47,6 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "create_ssm_judge_user" {
-  description = "Create IAM user for judge access via SSM"
-  type        = bool
-  default     = false
-}
-
 variable "create_ecr" {
   description = "Create ECR repository (set to false for staging to use existing production ECR)"
   type        = bool

@@ -23,22 +23,9 @@ output "vpc_id" {
   value       = aws_vpc.main.id
 }
 
-# Judge SSM access credentials
-output "judge_access_key_id" {
-  description = "Judge IAM user access key ID"
-  value       = var.create_ssm_judge_user ? aws_iam_access_key.judge[0].id : null
-  sensitive   = true
-}
-
-output "judge_secret_access_key" {
-  description = "Judge IAM user secret access key"
-  value       = var.create_ssm_judge_user ? aws_iam_access_key.judge[0].secret : null
-  sensitive   = true
-}
-
-# SSM commands for judge
+# SSM port forward command
 output "ssm_port_forward_command" {
-  description = "Command for judge to create SSM port forwarding session"
+  description = "Command to create SSM port forwarding session"
   value       = <<-EOT
     # Install AWS CLI and session-manager-plugin first
     # Then run:

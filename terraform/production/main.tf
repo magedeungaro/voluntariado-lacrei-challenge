@@ -37,15 +37,14 @@ provider "random" {}
 module "lacrei_infra" {
   source = "../modules/lacrei-infra"
 
-  aws_region            = var.aws_region
-  environment           = "production"
-  project_name          = var.project_name
-  instance_type         = var.instance_type
-  db_name               = var.db_name
-  db_user               = var.db_user
-  db_password           = var.db_password
-  django_secret_key     = var.django_secret_key
-  vpc_cidr              = var.vpc_cidr
-  create_ssm_judge_user = var.create_ssm_judge_user # Judge user for challenge evaluation
-  create_ecr            = true                      # ECR is created in production and shared with staging
+  aws_region        = var.aws_region
+  environment       = "production"
+  project_name      = var.project_name
+  instance_type     = var.instance_type
+  db_name           = var.db_name
+  db_user           = var.db_user
+  db_password       = var.db_password
+  django_secret_key = var.django_secret_key
+  vpc_cidr          = var.vpc_cidr
+  create_ecr        = true # ECR is created in production and shared with staging
 }

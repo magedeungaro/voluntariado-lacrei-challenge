@@ -45,9 +45,3 @@ variable "vpc_cidr" {
   type        = string
   default     = "10.0.0.0/16"
 }
-
-variable "create_ssm_judge_user" {
-  description = "Create IAM user for judge access via SSM"
-  type        = bool
-  default     = true
-}

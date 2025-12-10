@@ -124,7 +124,3 @@ jobs:
           echo "Secret Name: EC2_INSTANCE_ID"
           echo "Secret Value: $(terraform output -raw ec2_instance_id)"
           echo "============================================================"
-          echo ""
-          echo "Judge credentials:"
-          echo "Access Key ID: $(terraform output -raw judge_access_key_id)"
-          echo "Secret Access Key: $(terraform output -raw judge_secret_access_key)"

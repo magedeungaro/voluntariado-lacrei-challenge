@@ -17,6 +17,3 @@ django_secret_key = "CHANGE_ME_PRODUCTION_DJANGO_SECRET_KEY"
 
 # VPC CIDR
 vpc_cidr = "10.0.0.0/16"
-
-# Create judge user for challenge evaluation
-create_ssm_judge_user = true
