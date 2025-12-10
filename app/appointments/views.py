@@ -1,7 +1,6 @@
 from django.db.models import QuerySet
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import serializers, viewsets
-from rest_framework.request import Request
 
 from .models import Appointment
 from .serializers import AppointmentDetailSerializer, AppointmentSerializer
