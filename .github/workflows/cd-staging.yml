@@ -1,7 +1,10 @@
 name: CD - Deploy to Staging
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches: [staging]
   workflow_dispatch:
     inputs:
@@ -27,6 +30,8 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     environment: staging
+    # Only run if CI succeeded (or if manually triggered)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - uses: actions/checkout@v4
