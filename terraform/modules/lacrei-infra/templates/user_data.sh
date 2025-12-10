@@ -6,7 +6,7 @@ exec > >(tee /var/log/user-data.log) 2>&1
 LOG_FILE="/var/log/user-data.log"
 
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    echo "[$$(date '+%Y-%m-%d %H:%M:%S')] $$1"
 }
 
 log "=========================================="
@@ -16,7 +16,7 @@ log "=========================================="
 
 # Ensure SSM agent is installed and running (required for AL2023)
 log "Installing SSM agent..."
-dnf install -y amazon-ssm-agent 2>&1 || log "SSM agent install failed with exit code $?"
+dnf install -y amazon-ssm-agent 2>&1 || log "SSM agent install failed with exit code $$?"
 log "Enabling SSM agent..."
 systemctl enable amazon-ssm-agent 2>&1 || log "SSM enable failed"
 log "Starting SSM agent..."
@@ -27,15 +27,15 @@ log "SSM agent installation complete"
 
 # Test network connectivity to SSM endpoints
 log "Testing connectivity to SSM endpoints..."
-curl -s -o /dev/null -w "%{http_code}" https://ssm.${aws_region}.amazonaws.com/ || log "Cannot reach ssm endpoint"
-curl -s -o /dev/null -w "%{http_code}" https://ssmmessages.${aws_region}.amazonaws.com/ || log "Cannot reach ssmmessages endpoint"
-curl -s -o /dev/null -w "%{http_code}" https://ec2messages.${aws_region}.amazonaws.com/ || log "Cannot reach ec2messages endpoint"
+curl -s -o /dev/null -w "%%{http_code}" https://ssm.${aws_region}.amazonaws.com/ || log "Cannot reach ssm endpoint"
+curl -s -o /dev/null -w "%%{http_code}" https://ssmmessages.${aws_region}.amazonaws.com/ || log "Cannot reach ssmmessages endpoint"
+curl -s -o /dev/null -w "%%{http_code}" https://ec2messages.${aws_region}.amazonaws.com/ || log "Cannot reach ec2messages endpoint"
 log "Connectivity test complete"
 
 # Check instance metadata
 log "Testing IMDS connectivity..."
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") || log "Failed to get IMDS token"
-curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id || log "Failed to get instance-id from IMDS"
+TOKEN=$$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") || log "Failed to get IMDS token"
+curl -s -H "X-aws-ec2-metadata-token: $$TOKEN" http://169.254.169.254/latest/meta-data/instance-id || log "Failed to get instance-id from IMDS"
 log "IMDS test complete"
 
 # Update system
