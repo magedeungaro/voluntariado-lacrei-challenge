@@ -52,3 +52,9 @@ variable "create_ssm_judge_user" {
   type        = bool
   default     = false
 }
+
+variable "create_ecr" {
+  description = "Create ECR repository (set to false for staging to use existing production ECR)"
+  type        = bool
+  default     = true
+}

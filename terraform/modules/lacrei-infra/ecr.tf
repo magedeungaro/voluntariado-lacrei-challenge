@@ -1,5 +1,6 @@
-# ECR Repository (shared across environments, uses tags to differentiate)
+# ECR Repository (shared across environments - only created in production)
 resource "aws_ecr_repository" "app" {
+  count                = var.create_ecr ? 1 : 0
   name                 = var.project_name
   image_tag_mutability = "MUTABLE"
 
@@ -12,13 +13,25 @@ resource "aws_ecr_repository" "app" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-ecr"
+    Name = "${var.project_name}-ecr"
   }
 }
 
-# ECR Lifecycle Policy (keep only last 10 images)
+# Data source to reference existing ECR (used when create_ecr is false)
+data "aws_ecr_repository" "existing" {
+  count = var.create_ecr ? 0 : 1
+  name  = var.project_name
+}
+
+# Local to get the ECR repository URL regardless of whether it was created or referenced
+locals {
+  ecr_repository_url = var.create_ecr ? aws_ecr_repository.app[0].repository_url : data.aws_ecr_repository.existing[0].repository_url
+}
+
+# ECR Lifecycle Policy (keep only last 10 images) - only when creating ECR
 resource "aws_ecr_lifecycle_policy" "app" {
-  repository = aws_ecr_repository.app.name
+  count      = var.create_ecr ? 1 : 0
+  repository = aws_ecr_repository.app[0].name
 
   policy = jsonencode({
     rules = [

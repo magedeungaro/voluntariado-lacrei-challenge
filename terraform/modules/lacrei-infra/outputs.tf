@@ -1,6 +1,6 @@
 output "ecr_repository_url" {
   description = "ECR repository URL"
-  value       = aws_ecr_repository.app.repository_url
+  value       = local.ecr_repository_url
 }
 
 output "ec2_instance_id" {
@@ -57,9 +57,9 @@ output "deployment_commands" {
   description = "Commands to deploy and switch blue/green"
   value       = <<-EOT
     # 1. Build and push image to ECR:
-    aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.app.repository_url}
-    docker build -t ${aws_ecr_repository.app.repository_url}:latest .
-    docker push ${aws_ecr_repository.app.repository_url}:latest
+    aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${local.ecr_repository_url}
+    docker build -t ${local.ecr_repository_url}:latest .
+    docker push ${local.ecr_repository_url}:latest
 
     # 2. Deploy to blue slot (via SSM):
     aws ssm send-command \

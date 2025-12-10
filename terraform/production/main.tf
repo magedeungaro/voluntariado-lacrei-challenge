@@ -47,4 +47,5 @@ module "lacrei_infra" {
   django_secret_key     = var.django_secret_key
   vpc_cidr              = var.vpc_cidr
   create_ssm_judge_user = var.create_ssm_judge_user # Judge user for challenge evaluation
+  create_ecr            = true                      # ECR is created in production and shared with staging
 }
