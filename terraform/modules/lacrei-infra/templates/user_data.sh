@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Ensure SSM agent is installed and running (required for AL2023)
+dnf install -y amazon-ssm-agent
+systemctl enable amazon-ssm-agent
+systemctl start amazon-ssm-agent
+
 # Update system
 dnf update -y
 
