@@ -34,6 +34,10 @@ resource "aws_security_group" "ec2" {
   tags = {
     Name = "${var.project_name}-${var.environment}-ec2-sg"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Security Group for RDS
