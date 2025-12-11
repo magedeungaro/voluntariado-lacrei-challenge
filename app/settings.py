@@ -184,7 +184,8 @@ if not DEBUG:
     if config("USE_HTTPS", default=False, cast=bool):
         CSRF_COOKIE_SECURE = True
         SESSION_COOKIE_SECURE = True
-        SECURE_SSL_REDIRECT = True
+        # Don't use SECURE_SSL_REDIRECT when behind nginx reverse proxy
+        # Nginx handles SSL termination and redirects
         SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Logging
