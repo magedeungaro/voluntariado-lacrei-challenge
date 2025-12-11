@@ -57,3 +57,26 @@ curl https://api.magenifica.dev/api/v1/health/
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   https://api.magenifica.dev/api/v1/professionals/
 ```
+
+## Postman Collection
+
+Uma collection Postman está disponível em `docs/postman_collection.json` com todos os endpoints configurados.
+
+### Autenticação Automática
+
+A collection inclui um **endpoint especial `fallback_token_request`** que deve ser executado **antes de fazer qualquer requisição na API**.
+
+**Como usar:**
+
+1. **Importe a collection**: `docs/postman_collection.json` no Postman
+2. **Configure as variáveis**: 
+   - `client_id`: Seu OAuth2 Client ID
+   - `client_secret`: Seu OAuth2 Client Secret
+   - `baseUrl`: URL da API (produção ou staging)
+3. **Execute `fallback_token_request` primeiro**: 
+   - Localizado em `api > oauth > fallback_token_request`
+   - Esse endpoint gera um novo access token OAuth2
+   - Atualiza automaticamente a variável `{{token}}` na collection
+4. **Use os outros endpoints**: Todos já estão configurados com `Authorization: Bearer {{token}}`
+
+> ⚠️ **Importante**: Sempre execute `fallback_token_request` antes de testar os endpoints protegidos. O token expira após algum tempo e precisa ser regerado.
