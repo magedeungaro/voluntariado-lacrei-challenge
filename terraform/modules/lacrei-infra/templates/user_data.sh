@@ -230,17 +230,18 @@ cat > /usr/local/bin/run-migrations.sh << 'MIGRATEEOF'
 #!/bin/bash
 set -e
 
-ECR_REPO="${ecr_repository_url}"
-AWS_REGION="${aws_region}"
+# Find the currently running container
+RUNNING_CONTAINER=$(docker ps --format '{{.Names}}' | grep -E 'lacrei-(blue|green)' | head -1)
 
-# Login to ECR
-aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+if [ -z "$RUNNING_CONTAINER" ]; then
+    echo "Error: No running lacrei container found"
+    exit 1
+fi
 
-# Run migrations
-docker run --rm \
-    --env-file /opt/lacrei-saude/.env \
-    "$ECR_REPO:latest" \
-    python manage.py migrate --noinput
+echo "Running migrations using container: $RUNNING_CONTAINER"
+
+# Run migrations in the active container
+docker exec "$RUNNING_CONTAINER" python manage.py migrate --noinput
 
 echo "Migrations completed!"
 MIGRATEEOF
