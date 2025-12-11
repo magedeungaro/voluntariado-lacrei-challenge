@@ -9,13 +9,13 @@ output "ec2_instance_id" {
 }
 
 output "ec2_public_ip" {
-  description = "EC2 public IP address"
-  value       = aws_instance.app.public_ip
+  description = "EC2 Elastic IP address (stable)"
+  value       = aws_eip.app.public_ip
 }
 
 output "api_url" {
   description = "Public API URL"
-  value       = "http://${aws_instance.app.public_ip}"
+  value       = "https://${var.domain_name}"
 }
 
 output "rds_endpoint" {

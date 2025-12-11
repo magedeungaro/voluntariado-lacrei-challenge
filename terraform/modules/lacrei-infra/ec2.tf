@@ -6,7 +6,7 @@ resource "aws_instance" "app" {
   subnet_id                   = aws_subnet.public[0].id
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
-  associate_public_ip_address = true
+  associate_public_ip_address = false
 
   root_block_device {
     volume_size           = 30
@@ -25,7 +25,6 @@ resource "aws_instance" "app" {
     django_secret_key  = var.django_secret_key
     project_name       = var.project_name
     environment        = var.environment
-    ec2_public_ip      = "3.239.228.179"
     domain_name        = var.domain_name
     ssl_email          = var.ssl_email
   }))
@@ -44,6 +43,21 @@ resource "aws_instance" "app" {
     aws_db_instance.main,
     aws_nat_gateway.main
   ]
+}
+
+# Elastic IP for stable public IP address
+resource "aws_eip" "app" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-eip"
+  }
+}
+
+# Associate Elastic IP with EC2 instance
+resource "aws_eip_association" "app" {
+  instance_id   = aws_instance.app.id
+  allocation_id = aws_eip.app.id
 }
 
 # CloudWatch Log Group
