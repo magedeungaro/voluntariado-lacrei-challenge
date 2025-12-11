@@ -79,8 +79,8 @@ DB_USER=${db_user}
 DB_PASSWORD=${db_password}
 DB_HOST=${db_host}
 DB_PORT=5432
-ALLOWED_HOSTS=localhost,127.0.0.1
-CORS_ALLOWED_ORIGINS=http://localhost:3000
+ALLOWED_HOSTS=*
+CORS_ALLOW_ALL_ORIGINS=true
 ENVIRONMENT=${environment}
 EOF
 

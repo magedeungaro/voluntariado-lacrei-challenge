@@ -127,6 +127,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "oauth2_provider.contrib.rest_framework.TokenHasReadWriteScope",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "300/second",  # Authenticated users: 300 requests per second
+    },
 }
 
 # Add browsable API in debug mode

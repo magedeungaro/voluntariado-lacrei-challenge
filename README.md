@@ -273,9 +273,18 @@ O IP público é fornecido como output do Terraform após o deploy.
 - `GET /api/v1/appointments/` - Lista consultas
 - `POST /api/v1/appointments/` - Cria consulta
 
+**⚠️ Nota sobre CORS:**
+
+A API está configurada com `CORS_ALLOW_ALL_ORIGINS=true` para facilitar testes e avaliação. Em um ambiente de produção real:
+
+- **APIs REST públicas** geralmente permitem qualquer origem, pois a segurança vem da autenticação (OAuth2/JWT), não de restrições CORS
+- **Restrições de origem** são úteis quando você tem um frontend específico (ex: `https://app.lacrei.com`) e quer impedir que outros sites façam requisições do browser do usuário
+
+A proteção da API é garantida pela **autenticação OAuth2** implementada via `django-oauth-toolkit`.
+
 ## Segurança
 
-- ✅ Sem portas públicas abertas (acesso via SSM)
+### Infraestrutura
 - ✅ IMDSv2 obrigatório
 - ✅ Secrets em variáveis de ambiente (nunca no código)
 - ✅ Security groups restritivos
@@ -283,6 +292,12 @@ O IP público é fornecido como output do Terraform após o deploy.
 - ✅ RDS em subnet privada
 - ✅ Criptografia em trânsito e em repouso
 - ✅ IAM com princípio de menor privilégio
+
+### API
+- ✅ **Autenticação OAuth2 obrigatória** via django-oauth-toolkit (todos os endpoints requerem token)
+- ✅ **Rate Limiting**: 300 requisições por segundo por usuário autenticado
+- ✅ **CORS configurado** (allow all origins para APIs públicas)
+- ✅ **Validação de dados** via Django REST Framework serializers
 
 ## Estratégia de Deploy: Blue/Green Simplificado
 
