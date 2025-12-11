@@ -55,5 +55,5 @@ variable "domain_name" {
 variable "ssl_email" {
   description = "Email address for SSL certificate notifications"
   type        = string
-  default     = "your-email@example.com"
+  # No default - must be provided via TF_VAR_ssl_email from GitHub secrets
 }
