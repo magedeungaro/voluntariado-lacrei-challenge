@@ -3,14 +3,8 @@ name: Terraform - Production
 on:
   push:
     branches: [release]
-    paths:
-      - 'terraform/modules/**'
-      - 'terraform/production/**'
   pull_request:
     branches: [release]
-    paths:
-      - 'terraform/modules/**'
-      - 'terraform/production/**'
   workflow_dispatch:
     inputs:
       action:
