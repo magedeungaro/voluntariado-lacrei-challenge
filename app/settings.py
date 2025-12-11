@@ -168,13 +168,21 @@ OAUTH2_PROVIDER = {
     "ROTATE_REFRESH_TOKEN": True,
 }
 
+# CSRF settings for HTTP (without HTTPS)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://localhost,http://127.0.0.1,http://3.239.228.179",
+    cast=Csv()
+)
+
 # Security settings for production
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
+    # Only enable secure cookies if using HTTPS
+    # CSRF_COOKIE_SECURE = True
+    # SESSION_COOKIE_SECURE = True
 
 # Logging
 LOGGING = {

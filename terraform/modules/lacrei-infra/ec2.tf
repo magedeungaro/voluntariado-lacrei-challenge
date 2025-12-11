@@ -24,6 +24,7 @@ resource "aws_instance" "app" {
     django_secret_key  = var.django_secret_key
     project_name       = var.project_name
     environment        = var.environment
+    ec2_public_ip      = "3.239.228.179"
   }))
 
   metadata_options {
