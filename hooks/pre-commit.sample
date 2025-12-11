@@ -52,5 +52,24 @@ $DOCKER_CMD poetry run mypy app/ || {
     exit 1
 }
 
+# Verifica formatação do Terraform
+if command -v terraform &> /dev/null; then
+    # Verifica se há arquivos terraform modificados
+    TERRAFORM_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.tf$' || true)
+    
+    if [ -n "$TERRAFORM_FILES" ]; then
+        echo ""
+        echo "🏗️  Verificando formatação do Terraform..."
+        terraform fmt -check -recursive terraform/ || {
+            echo "❌ Erro: Arquivos Terraform não estão formatados"
+            echo "💡 Execute: terraform fmt -recursive terraform/"
+            exit 1
+        }
+    fi
+else
+    echo ""
+    echo "⚠️  Terraform não encontrado, pulando verificação de formatação Terraform"
+fi
+
 echo ""
 echo "✅ Todas as verificações passaram! Commit permitido."
