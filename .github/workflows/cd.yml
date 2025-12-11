@@ -30,8 +30,8 @@ jobs:
     name: Deploy to AWS
     runs-on: ubuntu-latest
     environment: production
-    # Only run if CI succeeded (or if manually triggered)
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    # Only run if CI succeeded on release branch (or if manually triggered)
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'release') }}
     
     steps:
       - uses: actions/checkout@v4
@@ -237,11 +237,19 @@ jobs:
       - name: Health check
         env:
           INSTANCE_ID: ${{ steps.get-instance-id.outputs.instance_id }}
+          SLOT: ${{ steps.slot.outputs.slot }}
         run: |
+          # Determine port based on slot
+          if [ "$SLOT" = "blue" ]; then
+            PORT=8001
+          else
+            PORT=8002
+          fi
+          
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=["curl -4 -sf http://localhost/api/v1/health/ && echo Health check passed"]' \
+            --parameters "commands=[\"curl -4 -sf http://localhost:$PORT/api/v1/health/ && echo Health check passed\"]" \
             --query "Command.CommandId" \
             --output text)
           
