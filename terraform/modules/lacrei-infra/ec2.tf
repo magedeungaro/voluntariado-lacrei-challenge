@@ -1,4 +1,5 @@
 # EC2 Instance
+
 resource "aws_instance" "app" {
   ami                         = data.aws_ami.amazon_linux.id
   instance_type               = var.instance_type

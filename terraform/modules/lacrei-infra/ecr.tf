@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "app" {
   count                = var.create_ecr ? 1 : 0
   name                 = var.project_name
   image_tag_mutability = "MUTABLE"
-  force_delete         = true  # Allow deletion even with images
+  force_delete         = true # Allow deletion even with images
 
   image_scanning_configuration {
     scan_on_push = true
