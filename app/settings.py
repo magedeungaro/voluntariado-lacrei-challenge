@@ -172,7 +172,7 @@ OAUTH2_PROVIDER = {
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="http://localhost,http://127.0.0.1,http://3.239.228.179",
-    cast=Csv()
+    cast=Csv(),
 )
 
 # Security settings for production
