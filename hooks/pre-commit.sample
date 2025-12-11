@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Pre-commit hook para executar verificações de qualidade de código
+# Executa as mesmas verificações do CI (Black, isort, Flake8, MyPy)
+#
+# Para instalar:
+#   cp hooks/pre-commit.sample .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+
+echo "🔍 Executando verificações de qualidade de código..."
+
+# Verifica se está rodando dentro do Docker ou localmente
+if command -v docker &> /dev/null && docker ps | grep -q lacrei-2025-tl-web-1; then
+    DOCKER_CMD="docker exec lacrei-2025-tl-web-1"
+    echo "✓ Usando container Docker"
+else
+    DOCKER_CMD=""
+    echo "✓ Executando localmente"
+fi
+
+# Verifica formatação com Black
+echo ""
+echo "📝 Verificando formatação com Black..."
+$DOCKER_CMD poetry run black --check . || {
+    echo "❌ Erro: Código não está formatado com Black"
+    echo "💡 Execute: poetry run black . (ou docker exec lacrei-2025-tl-web-1 poetry run black .)"
+    exit 1
+}
+
+# Verifica ordenação de imports com isort
+echo ""
+echo "📦 Verificando imports com isort..."
+$DOCKER_CMD poetry run isort --check-only . || {
+    echo "❌ Erro: Imports não estão ordenados"
+    echo "💡 Execute: poetry run isort . (ou docker exec lacrei-2025-tl-web-1 poetry run isort .)"
+    exit 1
+}
+
+# Verifica estilo de código com Flake8
+echo ""
+echo "🔎 Verificando estilo com Flake8..."
+$DOCKER_CMD poetry run flake8 . || {
+    echo "❌ Erro: Problemas de estilo de código detectados"
+    exit 1
+}
+
+# Verifica tipos com MyPy (apenas app/)
+echo ""
+echo "🔬 Verificando tipos com MyPy..."
+$DOCKER_CMD poetry run mypy app/ || {
+    echo "❌ Erro: Problemas de tipagem detectados"
+    exit 1
+}
+
+echo ""
+echo "✅ Todas as verificações passaram! Commit permitido."

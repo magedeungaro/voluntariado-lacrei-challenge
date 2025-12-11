@@ -68,6 +68,10 @@ make install
 # Copie o arquivo de ambiente
 cp .env.example .env
 
+# Instale o pre-commit hook (opcional, mas recomendado)
+cp hooks/pre-commit.sample .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
 # Inicie os containers (PostgreSQL + App)
 make docker-up
 
