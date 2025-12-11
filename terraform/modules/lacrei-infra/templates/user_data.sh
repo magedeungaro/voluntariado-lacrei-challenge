@@ -81,7 +81,7 @@ DB_HOST=${db_host}
 DB_PORT=5432
 ALLOWED_HOSTS=*
 CORS_ALLOW_ALL_ORIGINS=true
-CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1,http://${ec2_public_ip}
+CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1,http://3.239.228.179,http://18.215.126.44
 ENVIRONMENT=${environment}
 EOF
 
