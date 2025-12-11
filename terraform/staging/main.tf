@@ -47,4 +47,6 @@ module "lacrei_infra" {
   django_secret_key = var.django_secret_key
   vpc_cidr          = var.vpc_cidr
   create_ecr        = false # Use existing ECR from production
+  domain_name       = var.domain_name
+  ssl_email         = var.ssl_email
 }

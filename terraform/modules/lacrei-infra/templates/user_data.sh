@@ -57,6 +57,15 @@ dnf install -y nginx
 systemctl enable nginx
 echo "Nginx installed"
 
+# Install Certbot for SSL certificates
+echo "Installing Certbot..."
+dnf install -y python3 augeas-libs
+python3 -m venv /opt/certbot
+/opt/certbot/bin/pip install --upgrade pip
+/opt/certbot/bin/pip install certbot certbot-nginx
+ln -sf /opt/certbot/bin/certbot /usr/bin/certbot
+echo "Certbot installed"
+
 # Install AWS CLI (for ECR login)
 echo "Installing AWS CLI..."
 dnf install -y aws-cli
@@ -79,9 +88,10 @@ DB_USER=${db_user}
 DB_PASSWORD=${db_password}
 DB_HOST=${db_host}
 DB_PORT=5432
-ALLOWED_HOSTS=*
-CORS_ALLOW_ALL_ORIGINS=true
-CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1,http://3.239.228.179,http://18.215.126.44
+ALLOWED_HOSTS=${domain_name}
+CORS_ALLOWED_ORIGINS=https://${domain_name}
+CSRF_TRUSTED_ORIGINS=https://${domain_name}
+USE_HTTPS=true
 ENVIRONMENT=${environment}
 EOF
 
@@ -96,7 +106,7 @@ upstream lacrei_backend {
 
 server {
     listen 80;
-    server_name _;
+    server_name ${domain_name};
 
     location / {
         proxy_pass http://lacrei_backend;
@@ -266,6 +276,25 @@ rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 echo "Starting nginx..."
 systemctl start nginx
 echo "Nginx started"
+
+# Get SSL certificate with Certbot
+echo "Obtaining SSL certificate..."
+if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
+    # Wait for nginx to be ready
+    sleep 5
+    
+    # Obtain certificate
+    certbot --nginx -d ${domain_name} \
+        --non-interactive \
+        --agree-tos \
+        --email ${ssl_email} \
+        --redirect \
+        --no-eff-email || echo "Failed to obtain SSL certificate. Check DNS configuration."
+    
+    echo "SSL certificate obtained successfully"
+else
+    echo "No domain name configured, skipping SSL setup"
+fi
 
 # Final SSM agent check
 echo "Final SSM agent status check..."

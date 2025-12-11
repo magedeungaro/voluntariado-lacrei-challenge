@@ -176,115 +176,62 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
 - **ECR**: Registro de imagens Docker (um por ambiente)
 - **SSM**: Acesso seguro sem portas públicas
 - **Blue/Green**: Dois containers (8001/8002) com switch via nginx
+- **SSL/HTTPS**: Certificados Let's Encrypt via Certbot (renovação automática)
 
 ### Ambientes
 
-| Ambiente | Branch | Terraform | Workflow |
-|----------|--------|-----------|----------|
-| Staging | `staging` | `terraform/staging/` | `cd-staging.yml` |
-| Production | `release` | `terraform/production/` | `cd.yml` |
+| Ambiente | Branch | URL | Workflow |
+|----------|--------|-----|----------|
+| Staging | `staging` | `https://api-stg.magenifica.dev` | `cd-staging.yml` |
+| Production | `release` | `https://api.magenifica.dev` | `cd.yml` |
 
-### Provisionar Infraestrutura
+### HTTPS & SSL
 
+A aplicação é servida via **HTTPS** usando certificados gratuitos do **Let's Encrypt**:
+
+- **Certificados SSL**: Obtidos automaticamente via Certbot durante o provisionamento da instância EC2
+- **Renovação automática**: Certbot renova certificados a cada 60 dias (antes da expiração de 90 dias)
+- **Redirecionamento HTTP → HTTPS**: Todas as requisições HTTP são automaticamente redirecionadas para HTTPS
+- **Nginx como reverse proxy**: Gerencia SSL/TLS e distribui tráfego entre containers blue/green
+
+**Por que HTTPS?**
+- **Segurança**: Criptografia de dados em trânsito (protege tokens OAuth2, credenciais)
+- **Requisito OAuth**: Providers OAuth (Google, Facebook) exigem HTTPS em produção
+- **SEO e Confiança**: Navegadores modernos sinalizam sites HTTP como "não seguros"
+- **Grátis**: Let's Encrypt fornece certificados SSL sem custo
+
+**Configuração**:
 ```bash
-# Para STAGING:
-cd terraform/staging
-cp terraform.tfvars.example terraform.tfvars
-# Edite terraform.tfvars com seus valores
+# Domínios configurados no Terraform
+domain_name = "api.magenifica.dev"        # Produção
+domain_name = "api-stg.magenifica.dev"    # Staging
 
-terraform init
-terraform plan
-terraform apply
-
-# Anote o ec2_instance_id e adicione ao GitHub Secrets como EC2_INSTANCE_ID_STAGING
-
-# Para PRODUCTION:
-cd terraform/production
-cp terraform.tfvars.example terraform.tfvars
-# Edite terraform.tfvars com seus valores
-
-terraform init
-terraform plan
-terraform apply
-
-# Anote o ec2_instance_id e adicione ao GitHub Secrets como EC2_INSTANCE_ID
-```
-
-### GitHub Secrets Necessários
-
-| Secret | Descrição |
-|--------|-----------|
-| `AWS_ACCESS_KEY_ID` | Credencial AWS para deploy |
-| `AWS_SECRET_ACCESS_KEY` | Credencial AWS para deploy |
-| `EC2_INSTANCE_ID_STAGING` | ID da instância EC2 de staging (output do Terraform) |
-| `EC2_INSTANCE_ID` | ID da instância EC2 de produção (output do Terraform) |
-| `DB_PASSWORD_STAGING` | Senha do banco de staging |
-| `DB_PASSWORD` | Senha do banco de produção |
-| `DJANGO_SECRET_KEY_STAGING` | Secret key Django para staging |
-| `DJANGO_SECRET_KEY` | Secret key Django para produção |
-
-### Deploy Manual
-
-```bash
-# 1. Build e push para ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ECR_URL>
-docker build -t <ECR_URL>:latest .
-docker push <ECR_URL>:latest
-
-# 2. Deploy no slot blue
-aws ssm send-command \
-  --instance-ids "<INSTANCE_ID>" \
-  --document-name "AWS-RunShellScript" \
-  --parameters 'commands=["sudo /usr/local/bin/deploy.sh blue latest"]'
-
-# 3. Rodar migrações
-aws ssm send-command \
-  --instance-ids "<INSTANCE_ID>" \
-  --document-name "AWS-RunShellScript" \
-  --parameters 'commands=["sudo /usr/local/bin/run-migrations.sh"]'
-
-# 4. Switch traffic para blue
-aws ssm send-command \
-  --instance-ids "<INSTANCE_ID>" \
-  --document-name "AWS-RunShellScript" \
-  --parameters 'commands=["sudo /usr/local/bin/switch-backend.sh blue"]'
+# Certbot obtém certificado automaticamente via user_data.sh
+# Nginx é reconfigurado para HTTPS com redirecionamento
 ```
 
 ### Acesso à API
 
-**⚠️ Nota sobre Arquitetura de Rede:**
-
-A API está implantada em uma **instância EC2 com IP público** para facilitar a avaliação do desafio. Em um ambiente de produção real, a arquitetura recomendada seria:
-
-- **Application Load Balancer (ALB)** na camada pública
-- **Instâncias EC2 em subnets privadas** (sem IPs públicos)
-- **Acesso via ALB com SSL/TLS** (HTTPS)
-- **WAF (Web Application Firewall)** para proteção adicional
-
-Esta simplificação foi adotada por **razões de custo** (~$20-25/mês para ALB + certificado SSL), mas a infraestrutura está preparada para migração para ALB quando necessário (basta descomentar o módulo ALB no Terraform).
-
-**URL da API em produção:**
-```
-http://3.239.228.179/api/v1/
-```
-
-⚠️ **HTTP only**: HTTPS requer domínio próprio, não implementado para manter foco em infraestrutura/CI/CD.
+**URLs da API:**
+- **Produção**: `https://api.magenifica.dev/api/v1/`
+- **Staging**: `https://api-stg.magenifica.dev/api/v1/`
 
 **Endpoints disponíveis:**
 - `GET /api/v1/health/` - Health check
-- `GET /api/v1/professionals/` - Lista profissionais
-- `POST /api/v1/professionals/` - Cria profissional
-- `GET /api/v1/appointments/` - Lista consultas
-- `POST /api/v1/appointments/` - Cria consulta
+- `GET /api/v1/professionals/` - Lista profissionais (requer OAuth2)
+- `POST /api/v1/professionals/` - Cria profissional (requer OAuth2)
+- `GET /api/v1/appointments/` - Lista consultas (requer OAuth2)
+- `POST /api/v1/appointments/` - Cria consulta (requer OAuth2)
 
-**⚠️ Nota sobre CORS:**
+**Exemplo de requisição:**
+```bash
+# Health check (público)
+curl https://api.magenifica.dev/api/v1/health/
 
-A API está configurada com `CORS_ALLOW_ALL_ORIGINS=true` para facilitar testes e avaliação. Em um ambiente de produção real:
-
-- **APIs REST públicas** geralmente permitem qualquer origem, pois a segurança vem da autenticação (OAuth2/JWT), não de restrições CORS
-- **Restrições de origem** são úteis quando você tem um frontend específico (ex: `https://app.lacrei.com`) e quer impedir que outros sites façam requisições do browser do usuário
-
-A proteção da API é garantida pela **autenticação OAuth2** implementada via `django-oauth-toolkit`.
+# Endpoints protegidos (requer token OAuth2)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://api.magenifica.dev/api/v1/professionals/
+```
 
 ## Segurança
 

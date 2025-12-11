@@ -52,3 +52,15 @@ variable "create_ecr" {
   type        = bool
   default     = true
 }
+
+variable "domain_name" {
+  description = "Domain name for the application (e.g., api.magenifica.dev)"
+  type        = string
+  default     = "_"
+}
+
+variable "ssl_email" {
+  description = "Email address for SSL certificate notifications from Let's Encrypt"
+  type        = string
+  default     = "admin@example.com"
+}

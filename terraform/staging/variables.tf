@@ -45,3 +45,15 @@ variable "vpc_cidr" {
   type        = string
   default     = "10.1.0.0/16" # Different CIDR from production
 }
+
+variable "domain_name" {
+  description = "Domain name for the staging application"
+  type        = string
+  default     = "api-stg.magenifica.dev"
+}
+
+variable "ssl_email" {
+  description = "Email address for SSL certificate notifications"
+  type        = string
+  default     = "your-email@example.com"
+}

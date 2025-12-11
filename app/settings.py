@@ -168,10 +168,10 @@ OAUTH2_PROVIDER = {
     "ROTATE_REFRESH_TOKEN": True,
 }
 
-# CSRF settings for HTTP (without HTTPS)
+# CSRF settings - supports both HTTP (dev) and HTTPS (production)
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="http://localhost,http://127.0.0.1,http://3.239.228.179,http://18.215.126.44",
+    default="http://localhost,http://127.0.0.1,https://api.magenifica.dev,https://api-stg.magenifica.dev",
     cast=Csv(),
 )
 
@@ -180,9 +180,12 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
-    # Only enable secure cookies if using HTTPS
-    # CSRF_COOKIE_SECURE = True
-    # SESSION_COOKIE_SECURE = True
+    # Enable secure cookies when using HTTPS (domains with SSL)
+    if config("USE_HTTPS", default=False, cast=bool):
+        CSRF_COOKIE_SECURE = True
+        SESSION_COOKIE_SECURE = True
+        SECURE_SSL_REDIRECT = True
+        SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Logging
 LOGGING = {

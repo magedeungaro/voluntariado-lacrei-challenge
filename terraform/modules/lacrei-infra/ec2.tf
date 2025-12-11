@@ -25,6 +25,8 @@ resource "aws_instance" "app" {
     project_name       = var.project_name
     environment        = var.environment
     ec2_public_ip      = "3.239.228.179"
+    domain_name        = var.domain_name
+    ssl_email          = var.ssl_email
   }))
 
   metadata_options {

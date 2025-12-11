@@ -47,4 +47,6 @@ module "lacrei_infra" {
   django_secret_key = var.django_secret_key
   vpc_cidr          = var.vpc_cidr
   create_ecr        = true # ECR is created in production and shared with staging
+  domain_name       = var.domain_name
+  ssl_email         = var.ssl_email
 }
