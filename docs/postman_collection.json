@@ -1,0 +1,1310 @@
+{
+	"info": {
+		"_postman_id": "b32b443d-70e7-4fe4-b21a-1ce889f4052e",
+		"name": "Lacrei Saúde API",
+		"description": "API REST para gerenciamento de profissionais de saúde e consultas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30666376"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "v1",
+					"item": [
+						{
+							"name": "appointments",
+							"item": [
+								{
+									"name": "{uuid}",
+									"item": [
+										{
+											"name": "Obter detalhes da consulta",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "692dd2c3-9a24-4a54-8c8b-43e5dbdc81d7"
+														}
+													]
+												},
+												"description": "Retorna os detalhes de uma consulta específica com informações do profissional."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"appointments",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"created_at\": \"1950-04-25T18:03:53.628Z\",\n  \"date\": \"1995-02-28T06:52:06.096Z\",\n  \"professional\": {\n    \"address\": {\n      \"city\": \"string\",\n      \"state\": \"string\",\n      \"street\": \"string\",\n      \"zip_code\": \"42360676\",\n      \"number\": \"string\",\n      \"neighborhood\": \"string\",\n      \"complement\": \"string\"\n    },\n    \"contacts\": [\n      {\n        \"kind\": \"email\",\n        \"value\": \"string\"\n      },\n      {\n        \"kind\": \"mobile\",\n        \"value\": \"string\"\n      }\n    ],\n    \"profession\": \"string\",\n    \"social_name\": \"string\",\n    \"uuid\": \"5677a505-b28a-c7f5-a2f0-013e05c4b95a\"\n  },\n  \"updated_at\": \"1997-03-17T01:46:10.909Z\",\n  \"uuid\": \"17ce1085-2fcb-d497-7a32-b96e3045eca4\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Atualizar consulta",
+											"request": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"date\": \"2020-11-07T19:50:15.741Z\",\n  \"professional_uuid\": \"ebbfe395-9f0f-429a-dc9b-f2baa9137667\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+														}
+													]
+												},
+												"description": "Atualiza todos os campos de uma consulta."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"date\": \"2020-11-07T19:50:15.741Z\",\n  \"professional_uuid\": \"ebbfe395-9f0f-429a-dc9b-f2baa9137667\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"appointments",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"created_at\": \"1998-09-21T12:00:26.884Z\",\n  \"date\": \"1977-04-01T12:40:14.912Z\",\n  \"professional_uuid\": \"533543dc-1a2e-bc64-e243-b2853da5cf23\",\n  \"updated_at\": \"1970-01-02T20:27:05.350Z\",\n  \"uuid\": \"bdc99c56-2f8f-83cc-5b16-ecb19f653c16\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Atualizar parcialmente consulta",
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"date\": \"2026-06-06\",\n  \"professional_uuid\": \"93c0dbfe-7645-4401-9ef2-3eb6b497b7fa\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "692dd2c3-9a24-4a54-8c8b-43e5dbdc81d7"
+														}
+													]
+												},
+												"description": "Atualiza campos específicos de uma consulta."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"date\": \"1971-04-15T08:04:20.496Z\",\n  \"professional_uuid\": \"22f75449-204a-b867-8253-1e0c5955b944\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"appointments",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"created_at\": \"1998-09-21T12:00:26.884Z\",\n  \"date\": \"1977-04-01T12:40:14.912Z\",\n  \"professional_uuid\": \"533543dc-1a2e-bc64-e243-b2853da5cf23\",\n  \"updated_at\": \"1970-01-02T20:27:05.350Z\",\n  \"uuid\": \"bdc99c56-2f8f-83cc-5b16-ecb19f653c16\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Excluir consulta",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+														}
+													]
+												},
+												"description": "Exclui uma consulta."
+											},
+											"response": [
+												{
+													"name": "No response body",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/appointments/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"appointments",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "No Content",
+													"code": 204,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Listar consultas",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/appointments/",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												""
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "9284",
+													"description": "Um número de página dentro do conjunto de resultados paginado.",
+													"disabled": true
+												},
+												{
+													"key": "professional_uuid",
+													"value": "93c0dbfe-7645-4401-9ef2-3eb6b497b7fa",
+													"description": "Filtrar consultas pelo UUID do profissional",
+													"disabled": true
+												}
+											]
+										},
+										"description": "Retorna uma lista paginada de todas as consultas. Pode ser filtrada pelo parâmetro professional_uuid."
+									},
+									"response": [
+										{
+											"name": "Untitled Response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "<token>",
+														"description": "Added as a part of security scheme: oauth2"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/?page=9284&professional_uuid=string",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														""
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "9284",
+															"description": "Um número de página dentro do conjunto de resultados paginado."
+														},
+														{
+															"key": "professional_uuid",
+															"value": "string",
+															"description": "Filtrar consultas pelo UUID do profissional"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"count\": 123,\n  \"results\": [\n    {\n      \"created_at\": \"2004-06-08T09:51:06.808Z\",\n      \"date\": \"1961-03-30T16:51:43.187Z\",\n      \"professional\": {\n        \"address\": {\n          \"city\": \"string\",\n          \"state\": \"string\",\n          \"street\": \"string\",\n          \"zip_code\": \"96404518\",\n          \"number\": \"string\",\n          \"neighborhood\": \"string\",\n          \"complement\": \"string\"\n        },\n        \"contacts\": [\n          {\n            \"kind\": \"linkedin\",\n            \"value\": \"string\"\n          },\n          {\n            \"kind\": \"email\",\n            \"value\": \"string\"\n          }\n        ],\n        \"profession\": \"string\",\n        \"social_name\": \"string\",\n        \"uuid\": \"e1493d1b-5adb-968c-34b7-49583b874b17\"\n      },\n      \"updated_at\": \"1989-08-20T13:35:42.571Z\",\n      \"uuid\": \"2120eb4f-ab05-24de-87e7-3f8d82b840ec\"\n    },\n    {\n      \"created_at\": \"2005-10-13T02:40:18.360Z\",\n      \"date\": \"1946-02-09T11:05:26.257Z\",\n      \"professional\": {\n        \"address\": {\n          \"city\": \"string\",\n          \"state\": \"string\",\n          \"street\": \"string\",\n          \"zip_code\": \"75650962\",\n          \"number\": \"string\",\n          \"neighborhood\": \"string\",\n          \"complement\": \"string\"\n        },\n        \"contacts\": [\n          {\n            \"kind\": \"linkedin\",\n            \"value\": \"string\"\n          },\n          {\n            \"kind\": \"email\",\n            \"value\": \"string\"\n          }\n        ],\n        \"profession\": \"string\",\n        \"social_name\": \"string\",\n        \"uuid\": \"ff48f5ce-d6c3-bd8d-87e6-6c9e85ccf5cb\"\n      },\n      \"updated_at\": \"1958-01-09T08:51:56.643Z\",\n      \"uuid\": \"665f78c8-8360-ac56-9cb5-89e49729d61f\"\n    }\n  ],\n  \"next\": \"http://api.example.org/accounts/?page=4\",\n  \"previous\": \"http://api.example.org/accounts/?page=2\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Criar consulta",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"date\": \"2026-05-02\",\n  \"professional_uuid\": \"93c0dbfe-7645-4401-9ef2-3eb6b497b7fa\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/appointments/",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												""
+											]
+										},
+										"description": "Cria uma nova consulta vinculada a um profissional."
+									},
+									"response": [
+										{
+											"name": "Untitled Response",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "<token>",
+														"description": "Added as a part of security scheme: oauth2"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"date\": \"2020-11-07T19:50:15.741Z\",\n  \"professional_uuid\": \"ebbfe395-9f0f-429a-dc9b-f2baa9137667\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/appointments/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"appointments",
+														""
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"created_at\": \"1998-09-21T12:00:26.884Z\",\n  \"date\": \"1977-04-01T12:40:14.912Z\",\n  \"professional_uuid\": \"533543dc-1a2e-bc64-e243-b2853da5cf23\",\n  \"updated_at\": \"1970-01-02T20:27:05.350Z\",\n  \"uuid\": \"bdc99c56-2f8f-83cc-5b16-ecb19f653c16\"\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "professionals",
+							"item": [
+								{
+									"name": "{uuid}",
+									"item": [
+										{
+											"name": "Obter detalhes do profissional",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+														}
+													]
+												},
+												"description": "Retorna os detalhes de um profissional de saúde específico."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"professionals",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"45691579\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"linkedin\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"phone\",\n      \"value\": \"string\"\n    }\n  ],\n  \"created_at\": \"1953-01-30T00:55:04.813Z\",\n  \"profession\": \"string\",\n  \"social_name\": \"string\",\n  \"updated_at\": \"1970-05-03T23:14:09.343Z\",\n  \"uuid\": \"03fd0a2d-9fbe-ede2-57f9-19ee26e6588f\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Atualizar profissional",
+											"request": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"97414161\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"mobile\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"whatsapp\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+														}
+													]
+												},
+												"description": "Atualiza todos os campos de um profissional de saúde."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"97414161\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"mobile\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"whatsapp\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"professionals",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"45716274\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"phone\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"email\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\",\n  \"uuid\": \"a5b38396-9b6a-01a3-1d6b-0847603d6142\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Atualizar parcialmente profissional",
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"social_name\": \"string\",\n  \"profession\": \"string\",\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"02338293\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"email\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"linkedin\",\n      \"value\": \"string\"\n    }\n  ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+														}
+													]
+												},
+												"description": "Atualiza campos específicos de um profissional de saúde."
+											},
+											"response": [
+												{
+													"name": "Untitled Response",
+													"originalRequest": {
+														"method": "PATCH",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"social_name\": \"string\",\n  \"profession\": \"string\",\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"02338293\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"email\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"linkedin\",\n      \"value\": \"string\"\n    }\n  ]\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"professionals",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"45716274\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"phone\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"email\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\",\n  \"uuid\": \"a5b38396-9b6a-01a3-1d6b-0847603d6142\"\n}"
+												}
+											]
+										},
+										{
+											"name": "Excluir profissional",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														":uuid",
+														""
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "ad7afbcd-b694-4468-b907-cf0262c7115c"
+														}
+													]
+												},
+												"description": "Exclui um profissional de saúde."
+											},
+											"response": [
+												{
+													"name": "No response body",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "<token>",
+																"description": "Added as a part of security scheme: oauth2"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/professionals/:uuid/",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"professionals",
+																":uuid",
+																""
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "3cd545ed-3054-2d50-6b40-328367f880cf"
+																}
+															]
+														}
+													},
+													"status": "No Content",
+													"code": 204,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Listar profissionais",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/professionals/",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"professionals",
+												""
+											]
+										},
+										"description": "Retorna uma lista paginada de todos os profissionais de saúde."
+									},
+									"response": [
+										{
+											"name": "Untitled Response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "<token>",
+														"description": "Added as a part of security scheme: oauth2"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/?page=9284",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														""
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "9284",
+															"description": "Um número de página dentro do conjunto de resultados paginado."
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"count\": 123,\n  \"results\": [\n    {\n      \"address\": {\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"street\": \"string\",\n        \"zip_code\": \"64990690\",\n        \"number\": \"string\",\n        \"neighborhood\": \"string\",\n        \"complement\": \"string\"\n      },\n      \"contacts\": [\n        {\n          \"kind\": \"phone\",\n          \"value\": \"string\"\n        },\n        {\n          \"kind\": \"whatsapp\",\n          \"value\": \"string\"\n        }\n      ],\n      \"profession\": \"string\",\n      \"social_name\": \"string\",\n      \"uuid\": \"b483a152-c1bb-d382-d544-2cf933b55b17\"\n    },\n    {\n      \"address\": {\n        \"city\": \"string\",\n        \"state\": \"string\",\n        \"street\": \"string\",\n        \"zip_code\": \"14966448\",\n        \"number\": \"string\",\n        \"neighborhood\": \"string\",\n        \"complement\": \"string\"\n      },\n      \"contacts\": [\n        {\n          \"kind\": \"whatsapp\",\n          \"value\": \"string\"\n        },\n        {\n          \"kind\": \"linkedin\",\n          \"value\": \"string\"\n        }\n      ],\n      \"profession\": \"string\",\n      \"social_name\": \"string\",\n      \"uuid\": \"28aedc3b-eb50-078a-450d-1c76953a9e4f\"\n    }\n  ],\n  \"next\": \"http://api.example.org/accounts/?page=4\",\n  \"previous\": \"http://api.example.org/accounts/?page=2\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Criar profissional",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"address\": {\n    \"city\": \"piracicaba\",\n    \"state\": \"sp\",\n    \"street\": \"rua leontino boscariol\",\n    \"zip_code\": \"13420340\",\n    \"number\": \"40\",\n    \"neighborhood\": \"morumbi\",\n    \"complement\": null\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"mobile\",\n      \"value\": \"19997250153\"\n    },\n    {\n      \"kind\": \"whatsapp\",\n      \"value\": \"19997250153\"\n    }\n  ],\n  \"profession\": \"Desenvolvedora\",\n  \"social_name\": \"Magezita\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/professionals/",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"professionals",
+												""
+											],
+											"query": [
+												{
+													"key": "",
+													"value": "",
+													"disabled": true
+												}
+											]
+										},
+										"description": "Cria um novo profissional de saúde com endereço e contatos."
+									},
+									"response": [
+										{
+											"name": "Untitled Response",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "<token>",
+														"description": "Added as a part of security scheme: oauth2"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"97414161\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"mobile\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"whatsapp\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/professionals/",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"professionals",
+														""
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"address\": {\n    \"city\": \"string\",\n    \"state\": \"string\",\n    \"street\": \"string\",\n    \"zip_code\": \"45716274\",\n    \"number\": \"string\",\n    \"neighborhood\": \"string\",\n    \"complement\": \"string\"\n  },\n  \"contacts\": [\n    {\n      \"kind\": \"phone\",\n      \"value\": \"string\"\n    },\n    {\n      \"kind\": \"email\",\n      \"value\": \"string\"\n    }\n  ],\n  \"profession\": \"string\",\n  \"social_name\": \"string\",\n  \"uuid\": \"a5b38396-9b6a-01a3-1d6b-0847603d6142\"\n}"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "oauth",
+					"item": [
+						{
+							"name": "fallback_token_request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Parse the response body as JSON\r",
+											"const responseBodyJson = pm.response.json();\r",
+											"\r",
+											"// Check that the status code is 200\r",
+											"pm.test('Status code is 200', function () {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Check that access_token exists in the response\r",
+											"pm.test('Response contains access_token', function () {\r",
+											"  pm.expect(responseBodyJson).to.have.property('access_token');\r",
+											"  pm.expect(responseBodyJson.access_token).to.be.a('string').that.is.not.empty;\r",
+											"});\r",
+											"\r",
+											"// Set the access_token to the token variable (collection or environment level)\r",
+											"if (responseBodyJson.access_token) {\r",
+											"  pm.collectionVariables.set('token', responseBodyJson.access_token);\r",
+											"  console.log('Access token set to collection variable \"token\"');\r",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{client_id}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{client_secret}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										}
+									],
+									"options": {
+										"urlencoded": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/oauth/token/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"oauth",
+										"token",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			}
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "mage1",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "client_credentials",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{baseUrl}}oauth/token/",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{client_id}}",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{client_secret}}",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "read write",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "body",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.magenifica.dev"
+		},
+		{
+			"key": "client_id",
+			"value": "a_ser_fornecido",
+			"type": "string"
+		},
+		{
+			"key": "client_secret",
+			"value": "a_ser_fornecido",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "a_ser_gerado",
+			"type": "string"
+		}
+	]
+}
