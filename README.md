@@ -261,10 +261,10 @@ Esta simplificação foi adotada por **razões de custo** (~$20-25/mês para ALB
 
 **URL da API em produção:**
 ```
-http://<PUBLIC_IP>/api/v1/
+http://3.239.228.179/api/v1/
 ```
 
-O IP público é fornecido como output do Terraform após o deploy.
+⚠️ **HTTP only**: HTTPS requer domínio próprio, não implementado para manter foco em infraestrutura/CI/CD.
 
 **Endpoints disponíveis:**
 - `GET /api/v1/health/` - Health check

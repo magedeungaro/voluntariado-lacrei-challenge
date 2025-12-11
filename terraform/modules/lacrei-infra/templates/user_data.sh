@@ -212,12 +212,22 @@ docker run -d \
 echo "Waiting for container to be healthy..."
 sleep 10
 
-# Check health
-if curl -sf "http://localhost:$PORT/api/v1/health/" > /dev/null; then
-    echo "Deployment to $SLOT successful!"
-    echo "Run 'sudo /usr/local/bin/switch-backend.sh $SLOT' to switch traffic"
+# Coleta arquivos estáticos
+echo "Coletando arquivos estáticos..."
+docker exec "$CONTAINER_NAME" python manage.py collectstatic --noinput
+
+# Copia arquivos estáticos para o host
+echo "Copiando arquivos estáticos para o host..."
+mkdir -p /opt/lacrei-saude/staticfiles
+docker cp "$CONTAINER_NAME:/app/staticfiles/." /opt/lacrei-saude/staticfiles/
+chmod -R 755 /opt/lacrei-saude/staticfiles
+
+# Verifica saúde
+if curl -4 -sf "http://localhost:$PORT/api/v1/health/" > /dev/null; then
+    echo "Deploy para $SLOT realizado com sucesso!"
+    echo "Execute 'sudo /usr/local/bin/switch-backend.sh $SLOT' para alternar o tráfego"
 else
-    echo "Health check failed!"
+    echo "Verificação de saúde falhou!"
     docker logs "$CONTAINER_NAME"
     exit 1
 fi
