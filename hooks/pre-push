@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pre-commit hook to upload changed setup scripts to S3
+# Pre-push hook to upload changed setup scripts to S3
 
 set -e
 
@@ -9,7 +9,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}Checking for changed setup scripts...${NC}"
+echo -e "${YELLOW}Checking for changed setup scripts before push...${NC}"
 
 # Get the scripts directory path
 SCRIPTS_DIR="terraform/modules/lacrei-infra/scripts"
@@ -20,21 +20,35 @@ if [ ! -d "$SCRIPTS_DIR" ]; then
     exit 0
 fi
 
-# Get list of changed script files in the staging area
-CHANGED_SCRIPTS=$(git diff --cached --name-only --diff-filter=ACM | grep "^${SCRIPTS_DIR}/.*\.sh$" || true)
+# Get list of changed script files between local and remote
+# Get the remote and local refs (passed as stdin to pre-push hook)
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        # Branch is being deleted, skip
+        continue
+    fi
+    
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch, check all commits
+        CHANGED_SCRIPTS=$(git diff --name-only --diff-filter=ACM $(git rev-list --max-parents=0 HEAD) $local_sha | grep "^${SCRIPTS_DIR}/.*\.sh$" || true)
+    else
+        # Existing branch, check diff with remote
+        CHANGED_SCRIPTS=$(git diff --name-only --diff-filter=ACM $remote_sha..$local_sha | grep "^${SCRIPTS_DIR}/.*\.sh$" || true)
+    fi
+done
 
 if [ -z "$CHANGED_SCRIPTS" ]; then
-    echo -e "${GREEN}No setup scripts changed${NC}"
+    echo -e "${GREEN}No setup scripts changed, skipping S3 upload${NC}"
     exit 0
 fi
 
 echo -e "${YELLOW}Changed scripts detected:${NC}"
-echo "$CHANGED_SCRIPTS"
+echo "$CHANGED_SCRIPTS" | sed 's/^/  - /'
 
 # Check if AWS CLI is available
 if ! command -v aws &> /dev/null; then
     echo -e "${RED}Error: AWS CLI is not installed${NC}"
-    echo -e "${RED}Please install AWS CLI or skip this hook with --no-verify${NC}"
+    echo -e "${YELLOW}Install AWS CLI or push with --no-verify to skip this hook${NC}"
     exit 1
 fi
 
@@ -80,12 +94,13 @@ done
 
 if [ $UPLOAD_FAILED -eq 1 ]; then
     echo -e "${RED}Some scripts failed to upload to S3${NC}"
-    echo -e "${YELLOW}Continue with commit anyway? (y/n)${NC}"
+    echo -e "${YELLOW}Continue with push anyway? (y/n)${NC}"
     read -r response
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Push aborted${NC}"
         exit 1
     fi
 fi
 
-echo -e "${GREEN}Script upload complete!${NC}"
+echo -e "${GREEN}✓ Script upload complete!${NC}"
 exit 0

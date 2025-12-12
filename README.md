@@ -53,21 +53,21 @@ Python 3.12 • Django 5.2 • DRF • PostgreSQL 16 • Docker • AWS (EC2, RD
 
 ## 🔧 Development
 
-### Pre-commit Hook for Script Updates
+### Pre-push Hook for Script Updates
 
-The project includes a pre-commit hook that automatically uploads changed setup scripts to S3:
+The project includes a pre-push hook that automatically uploads changed setup scripts to S3:
 
 ```bash
-# Install the pre-commit hook
-cp hooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+# Install the pre-push hook
+cp hooks/pre-push .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
 ```
 
 This hook:
 - Detects changes to scripts in `terraform/modules/lacrei-infra/scripts/`
 - Automatically uploads them to the appropriate S3 bucket (staging or production)
-- Runs on `staging` and `main` branches only
-- Can be skipped with `git commit --no-verify` if needed
+- Runs before `git push` on `staging` and `main` branches only
+- Can be skipped with `git push --no-verify` if needed
 
 ### EC2 User Data Architecture
 
