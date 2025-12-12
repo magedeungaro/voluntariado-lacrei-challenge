@@ -64,7 +64,9 @@ jobs:
           else
             echo "⏸️ Waiting for both workflows to succeed"
             echo "should_deploy=false" >> $GITHUB_OUTPUT
-          fi  deploy:
+          fi
+
+  deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: check-prerequisites
