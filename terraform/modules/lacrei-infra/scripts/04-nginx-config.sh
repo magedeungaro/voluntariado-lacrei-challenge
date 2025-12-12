@@ -59,11 +59,5 @@ rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 echo "Disabling default nginx server block..."
 sed -i '/^    server {$/,/^    }$/{s/^/# /}' /etc/nginx/nginx.conf
 
-# Test nginx configuration
-echo "Testing nginx configuration..."
-nginx -t
-
-# Start nginx
-echo "Starting nginx..."
-systemctl start nginx
-echo "Nginx started"
+# Don't start nginx yet - wait for SSL certificates in 06-ssl-certificates.sh
+echo "Nginx configured (will start after SSL setup)"
