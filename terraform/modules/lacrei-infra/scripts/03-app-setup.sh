@@ -6,8 +6,8 @@ echo "Creating app directory..."
 mkdir -p /opt/lacrei-saude
 cd /opt/lacrei-saude
 
-# Create environment file
-cat > /opt/lacrei-saude/.env << 'EOF'
+# Create environment file  
+cat > /opt/lacrei-saude/.env << EOF
 DEBUG=false
 SECRET_KEY=${django_secret_key}
 DB_NAME=${db_name}
