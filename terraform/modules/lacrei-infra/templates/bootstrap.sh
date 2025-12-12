@@ -56,6 +56,7 @@ for script in "$${SCRIPTS[@]}"; do
     sed "s|\$${environment}|${environment}|g" | \
     sed "s|\$${ssl_email}|${ssl_email}|g" | \
     sed "s|\$${certificates_s3_bucket}|${certificates_s3_bucket}|g" | \
+    sed "s|\$${scripts_s3_bucket}|${scripts_s3_bucket}|g" | \
     sed "s|\$${ecr_repository_url}|${ecr_repository_url}|g" > "$TEMP_SCRIPT"
   
   chmod +x "$TEMP_SCRIPT"
