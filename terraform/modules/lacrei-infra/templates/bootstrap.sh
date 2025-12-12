@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+# Note: not using 'set -e' here to allow retry logic for failed downloads
+# Individual script execution will still stop on errors
 
 # Bootstrap script - downloads and executes modular scripts from S3
 exec > >(tee /var/log/user-data.log) 2>&1
