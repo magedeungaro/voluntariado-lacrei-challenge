@@ -55,6 +55,11 @@ for cert_file in $CERT_FILES; do
     fi
 done
 
+# Start nginx now (after config is ready)
+echo "Starting nginx..."
+systemctl start nginx
+echo "Nginx started"
+
 # Get SSL certificate with Certbot or manual cert from S3
 echo "Managing SSL certificates..."
 if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
