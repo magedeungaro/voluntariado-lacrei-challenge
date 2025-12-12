@@ -75,12 +75,8 @@ if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
             systemctl start nginx || echo "Warning: nginx start had issues, continuing anyway"
             sleep 2
             
-            # Use staging server for non-production environments to avoid rate limits
+            # Use production Let's Encrypt for all environments
             CERTBOT_FLAGS="--nginx -d ${domain_name} --non-interactive --agree-tos --email ${ssl_email} --redirect --no-eff-email"
-            if [ "${environment}" != "production" ]; then
-                echo "Using Let's Encrypt staging server for ${environment} environment"
-                CERTBOT_FLAGS="$CERTBOT_FLAGS --staging"
-            fi
             
             # Obtain certificate
             if certbot $CERTBOT_FLAGS; then
