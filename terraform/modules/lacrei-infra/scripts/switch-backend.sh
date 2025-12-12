@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Source environment variables
+source /etc/lacrei-env.sh
+
 if [ -z "$1" ]; then
     echo "Usage: $0 blue|green"
     echo "Current backend:"

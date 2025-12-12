@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Source environment variables
+source /etc/lacrei-env.sh
+
 SLOT="$1"  # blue or green
 IMAGE_TAG="${2:-latest}"
 
@@ -19,8 +22,6 @@ else
 fi
 
 CONTAINER_NAME="lacrei-$SLOT"
-ECR_REPO="${ecr_repository_url}"
-AWS_REGION="${aws_region}"
 
 echo "Deploying to $SLOT slot (port $PORT)..."
 
