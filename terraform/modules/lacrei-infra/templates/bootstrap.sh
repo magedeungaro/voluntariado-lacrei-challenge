@@ -44,6 +44,14 @@ for script in "$${SCRIPTS[@]}"; do
   echo "=========================================="
   
   # Create a temporary script with template variables substituted
+  echo "Substituting variables in $script:"
+  echo "  aws_region: ${aws_region}"
+  echo "  environment: ${environment}"
+  echo "  domain_name: ${domain_name}"
+  echo "  ecr_repository_url: ${ecr_repository_url}"
+  echo "  scripts_s3_bucket: ${scripts_s3_bucket}"
+  echo "  certificates_s3_bucket: ${certificates_s3_bucket}"
+  
   TEMP_SCRIPT="/tmp/setup-scripts/temp-$script"
   cat "/tmp/setup-scripts/$script" | \
     sed 's|$${aws_region}|${aws_region}|g' | \
@@ -60,6 +68,12 @@ for script in "$${SCRIPTS[@]}"; do
     sed 's|$${ecr_repository_url}|${ecr_repository_url}|g' > "$TEMP_SCRIPT"
   
   chmod +x "$TEMP_SCRIPT"
+  
+  # Log a sample of the substituted script for debugging (first 20 lines)
+  if [ "$script" = "05-install-tools.sh" ]; then
+    echo "Sample of substituted 05-install-tools.sh (first 15 lines):"
+    head -15 "$TEMP_SCRIPT"
+  fi
   
   if bash "$TEMP_SCRIPT"; then
     echo "$script completed successfully"
