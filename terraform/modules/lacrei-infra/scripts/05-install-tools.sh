@@ -17,10 +17,10 @@ for script in deploy.sh switch-backend.sh run-migrations.sh backup-certificates.
     aws s3 cp "s3://$S3_BUCKET/$script" "/tmp/$script"
     
     # Substitute template variables with actual values
-    sed -e "s|\${aws_region}|$AWS_REGION|g" \
-        -e "s|\${ecr_repository_url}|$ECR_REPO|g" \
-        -e "s|\${certificates_s3_bucket}|$CERTS_BUCKET|g" \
-        -e "s|\${domain_name}|$DOMAIN|g" \
+    sed -e 's|${aws_region}|'"$AWS_REGION"'|g' \
+        -e 's|${ecr_repository_url}|'"$ECR_REPO"'|g' \
+        -e 's|${certificates_s3_bucket}|'"$CERTS_BUCKET"'|g' \
+        -e 's|${domain_name}|'"$DOMAIN"'|g' \
         "/tmp/$script" > "/usr/local/bin/$script"
     
     chmod +x "/usr/local/bin/$script"
