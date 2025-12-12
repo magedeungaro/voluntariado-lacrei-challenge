@@ -104,23 +104,41 @@ upstream lacrei_backend {
     server 127.0.0.1:8001;
 }
 
+# HTTP server - redirects to HTTPS
 server {
     listen 80;
     server_name ${domain_name};
+    return 301 https://\$host\$request_uri;
+}
+
+# HTTPS server
+server {
+    listen 443 ssl;
+    server_name ${domain_name};
+
+    # SSL certificate paths (will be populated by certbot or manual cert)
+    ssl_certificate     /etc/ssl/${domain_name}.crt;
+    ssl_certificate_key /etc/ssl/${domain_name}.key;
+    ssl_trusted_certificate /etc/ssl/${domain_name}.ca-bundle;
+
+    # SSL configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
 
     location / {
         proxy_pass http://lacrei_backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_connect_timeout 30s;
         proxy_read_timeout 30s;
     }
 
     location /api/v1/health/ {
         proxy_pass http://lacrei_backend;
-        proxy_set_header Host $host;
+        proxy_set_header Host \$host;
     }
 
     # Static files (if needed)
@@ -276,6 +294,22 @@ rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 echo "Disabling default nginx server block..."
 sed -i '/^    server {$/,/^    }$/{s/^/# /}' /etc/nginx/nginx.conf
 
+# Download manual SSL certificates from S3 if they exist
+echo "Checking for manual SSL certificates in S3..."
+S3_CERT_BUCKET="${certificates_s3_bucket}"
+CERT_FILES="${domain_name}.crt ${domain_name}.key ${domain_name}.ca-bundle"
+
+for cert_file in $CERT_FILES; do
+    if aws s3 ls "s3://$S3_CERT_BUCKET/$cert_file" 2>/dev/null; then
+        echo "Found $cert_file in S3, downloading..."
+        aws s3 cp "s3://$S3_CERT_BUCKET/$cert_file" "/etc/ssl/$cert_file"
+        chmod 600 "/etc/ssl/$cert_file"
+        echo "Downloaded and secured $cert_file"
+    else
+        echo "Manual certificate $cert_file not found in S3, will use Let's Encrypt"
+    fi
+done
+
 # Test nginx configuration
 echo "Testing nginx configuration..."
 nginx -t
@@ -338,39 +372,62 @@ BACKUPEOF
     echo "Certificate backup cron job configured"
 }
 
-# Get SSL certificate with Certbot
+# Get SSL certificate with Certbot or manual cert from S3
 echo "Managing SSL certificates..."
 if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
     # Wait for nginx to be ready
     sleep 5
     
-    # Try to restore existing certificates first
-    if restore_certificates; then
-        echo "Using restored certificates"
-        # Reload nginx to use restored certificates
-        nginx -t && systemctl reload nginx || echo "Warning: nginx reload failed"
-    else
-        echo "Obtaining new SSL certificate..."
+    # Check if manual certificates exist in S3
+    MANUAL_CERT_EXISTS=false
+    if aws s3 ls "s3://$S3_CERT_BUCKET/${domain_name}.crt" 2>/dev/null; then
+        echo "Found manual certificate in S3, downloading..."
+        aws s3 cp "s3://$S3_CERT_BUCKET/${domain_name}.crt" "/etc/ssl/${domain_name}.crt"
+        aws s3 cp "s3://$S3_CERT_BUCKET/${domain_name}.key" "/etc/ssl/${domain_name}.key"
+        aws s3 cp "s3://$S3_CERT_BUCKET/${domain_name}.ca-bundle" "/etc/ssl/${domain_name}.ca-bundle" 2>/dev/null || true
+        chmod 600 "/etc/ssl/${domain_name}.key"
+        echo "Manual certificates downloaded from S3"
+        MANUAL_CERT_EXISTS=true
         
-        # Use staging server for non-production environments to avoid rate limits
-        CERTBOT_FLAGS="--nginx -d ${domain_name} --non-interactive --agree-tos --email ${ssl_email} --redirect --no-eff-email"
-        if [ "${environment}" != "production" ]; then
-            echo "Using Let's Encrypt staging server for ${environment} environment"
-            CERTBOT_FLAGS="$CERTBOT_FLAGS --staging"
-        fi
-        
-        # Obtain certificate
-        if certbot $CERTBOT_FLAGS; then
-            echo "SSL certificate obtained successfully"
-            # Backup the new certificate
-            backup_certificates
+        # Test and reload nginx with manual cert
+        if nginx -t; then
+            systemctl reload nginx
+            echo "Nginx reloaded with manual certificate"
         else
-            echo "Failed to obtain SSL certificate. Check DNS configuration or rate limits."
+            echo "Warning: nginx config test failed with manual certificate"
         fi
     fi
     
-    # Setup automatic backup cron job
-    setup_cert_backup_cron
+    # If no manual cert, try Let's Encrypt
+    if [ "$MANUAL_CERT_EXISTS" = false ]; then
+        # Try to restore existing Let's Encrypt certificates first
+        if restore_certificates; then
+            echo "Using restored Let's Encrypt certificates"
+            # Reload nginx to use restored certificates
+            nginx -t && systemctl reload nginx || echo "Warning: nginx reload failed"
+        else
+            echo "Obtaining new SSL certificate from Let's Encrypt..."
+            
+            # Use staging server for non-production environments to avoid rate limits
+            CERTBOT_FLAGS="--nginx -d ${domain_name} --non-interactive --agree-tos --email ${ssl_email} --redirect --no-eff-email"
+            if [ "${environment}" != "production" ]; then
+                echo "Using Let's Encrypt staging server for ${environment} environment"
+                CERTBOT_FLAGS="$CERTBOT_FLAGS --staging"
+            fi
+            
+            # Obtain certificate
+            if certbot $CERTBOT_FLAGS; then
+                echo "SSL certificate obtained successfully"
+                # Backup the new certificate
+                backup_certificates
+            else
+                echo "Failed to obtain SSL certificate. Check DNS configuration or rate limits."
+            fi
+        fi
+        
+        # Setup automatic backup cron job for Let's Encrypt
+        setup_cert_backup_cron
+    fi
     
     echo "SSL certificate setup completed for ${environment}"
 else
