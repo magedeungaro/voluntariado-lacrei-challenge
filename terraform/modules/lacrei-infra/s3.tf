@@ -45,8 +45,158 @@ resource "aws_s3_bucket_lifecycle_configuration" "certificates" {
     id     = "delete-old-versions"
     status = "Enabled"
 
+    filter {
+      prefix = ""
+    }
+
     noncurrent_version_expiration {
       noncurrent_days = 30
     }
+  }
+}
+
+# S3 Bucket for user-data scripts
+resource "aws_s3_bucket" "scripts" {
+  bucket = "${var.project_name}-${var.environment}-scripts"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-scripts"
+  }
+}
+
+# Enable versioning for scripts
+resource "aws_s3_bucket_versioning" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Enable encryption for scripts
+resource "aws_s3_bucket_server_side_encryption_configuration" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# Block public access for scripts
+resource "aws_s3_bucket_public_access_block" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Lifecycle policy for scripts
+resource "aws_s3_bucket_lifecycle_configuration" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+
+  rule {
+    id     = "delete-old-versions"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+}
+
+# Upload modular scripts to S3
+resource "aws_s3_object" "init_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "00-init.sh"
+  source = "${path.module}/scripts/00-init.sh"
+  etag   = filemd5("${path.module}/scripts/00-init.sh")
+
+  tags = {
+    Name = "init-script"
+  }
+}
+
+resource "aws_s3_object" "ssm_agent_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "01-ssm-agent.sh"
+  source = "${path.module}/scripts/01-ssm-agent.sh"
+  etag   = filemd5("${path.module}/scripts/01-ssm-agent.sh")
+
+  tags = {
+    Name = "ssm-agent-script"
+  }
+}
+
+resource "aws_s3_object" "system_packages_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "02-system-packages.sh"
+  source = "${path.module}/scripts/02-system-packages.sh"
+  etag   = filemd5("${path.module}/scripts/02-system-packages.sh")
+
+  tags = {
+    Name = "system-packages-script"
+  }
+}
+
+resource "aws_s3_object" "app_setup_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "03-app-setup.sh"
+  source = "${path.module}/scripts/03-app-setup.sh"
+  etag   = filemd5("${path.module}/scripts/03-app-setup.sh")
+
+  tags = {
+    Name = "app-setup-script"
+  }
+}
+
+resource "aws_s3_object" "nginx_config_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "04-nginx-config.sh"
+  source = "${path.module}/scripts/04-nginx-config.sh"
+  etag   = filemd5("${path.module}/scripts/04-nginx-config.sh")
+
+  tags = {
+    Name = "nginx-config-script"
+  }
+}
+
+resource "aws_s3_object" "deployment_scripts_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "05-deployment-scripts.sh"
+  source = "${path.module}/scripts/05-deployment-scripts.sh"
+  etag   = filemd5("${path.module}/scripts/05-deployment-scripts.sh")
+
+  tags = {
+    Name = "deployment-scripts-script"
+  }
+}
+
+resource "aws_s3_object" "ssl_certificates_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "06-ssl-certificates.sh"
+  source = "${path.module}/scripts/06-ssl-certificates.sh"
+  etag   = filemd5("${path.module}/scripts/06-ssl-certificates.sh")
+
+  tags = {
+    Name = "ssl-certificates-script"
+  }
+}
+
+resource "aws_s3_object" "finalize_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "99-finalize.sh"
+  source = "${path.module}/scripts/99-finalize.sh"
+  etag   = filemd5("${path.module}/scripts/99-finalize.sh")
+
+  tags = {
+    Name = "finalize-script"
   }
 }
