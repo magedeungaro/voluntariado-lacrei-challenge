@@ -23,7 +23,8 @@ server {
     # SSL certificate paths (will be populated by certbot or manual cert)
     ssl_certificate     /etc/ssl/${domain_name}.crt;
     ssl_certificate_key /etc/ssl/${domain_name}.key;
-    ssl_trusted_certificate /etc/ssl/${domain_name}.ca-bundle;
+    # ssl_trusted_certificate is optional - only include if file exists
+    # ssl_trusted_certificate /etc/ssl/${domain_name}.ca-bundle;
 
     # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;

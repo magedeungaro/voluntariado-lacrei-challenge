@@ -55,10 +55,17 @@ for cert_file in $CERT_FILES; do
     fi
 done
 
-# Start nginx now (after config is ready)
-echo "Starting nginx..."
-systemctl start nginx
-echo "Nginx started"
+# Test nginx config first
+echo "Testing nginx configuration..."
+if nginx -t; then
+    echo "Nginx config test passed, starting nginx..."
+    systemctl start nginx
+    echo "Nginx started"
+else
+    echo "ERROR: Nginx config test failed"
+    nginx -t 2>&1 || true  # Show the error
+    exit 1
+fi
 
 # Get SSL certificate with Certbot or manual cert from S3
 echo "Managing SSL certificates..."
