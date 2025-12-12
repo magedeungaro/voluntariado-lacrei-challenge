@@ -22,7 +22,7 @@ SCRIPTS=(
   "02-system-packages.sh"
   "03-app-setup.sh"
   "04-nginx-config.sh"
-  "05-deployment-scripts.sh"
+  "05-install-tools.sh"
   "06-ssl-certificates.sh"
   "99-finalize.sh"
 )

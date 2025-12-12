@@ -168,14 +168,14 @@ resource "aws_s3_object" "nginx_config_script" {
   }
 }
 
-resource "aws_s3_object" "deployment_scripts_script" {
+resource "aws_s3_object" "install_tools_script" {
   bucket = aws_s3_bucket.scripts.id
-  key    = "05-deployment-scripts.sh"
-  source = "${path.module}/scripts/05-deployment-scripts.sh"
-  etag   = filemd5("${path.module}/scripts/05-deployment-scripts.sh")
+  key    = "05-install-tools.sh"
+  source = "${path.module}/scripts/05-install-tools.sh"
+  etag   = filemd5("${path.module}/scripts/05-install-tools.sh")
 
   tags = {
-    Name = "deployment-scripts-script"
+    Name = "install-tools-script"
   }
 }
 
@@ -198,5 +198,50 @@ resource "aws_s3_object" "finalize_script" {
 
   tags = {
     Name = "finalize-script"
+  }
+}
+
+# Operational scripts (deployed to /usr/local/bin)
+resource "aws_s3_object" "deploy_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "deploy.sh"
+  source = "${path.module}/scripts/deploy.sh"
+  etag   = filemd5("${path.module}/scripts/deploy.sh")
+
+  tags = {
+    Name = "deploy-script"
+  }
+}
+
+resource "aws_s3_object" "switch_backend_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "switch-backend.sh"
+  source = "${path.module}/scripts/switch-backend.sh"
+  etag   = filemd5("${path.module}/scripts/switch-backend.sh")
+
+  tags = {
+    Name = "switch-backend-script"
+  }
+}
+
+resource "aws_s3_object" "run_migrations_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "run-migrations.sh"
+  source = "${path.module}/scripts/run-migrations.sh"
+  etag   = filemd5("${path.module}/scripts/run-migrations.sh")
+
+  tags = {
+    Name = "run-migrations-script"
+  }
+}
+
+resource "aws_s3_object" "backup_certificates_script" {
+  bucket = aws_s3_bucket.scripts.id
+  key    = "backup-certificates.sh"
+  source = "${path.module}/scripts/backup-certificates.sh"
+  etag   = filemd5("${path.module}/scripts/backup-certificates.sh")
+
+  tags = {
+    Name = "backup-certificates-script"
   }
 }
