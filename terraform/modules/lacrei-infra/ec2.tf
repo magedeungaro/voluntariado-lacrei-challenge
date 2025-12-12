@@ -30,6 +30,8 @@ resource "aws_instance" "app" {
     scripts_s3_bucket      = aws_s3_bucket.scripts.bucket
   })
 
+  user_data_replace_on_change = true
+
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required" # IMDSv2 required for security
