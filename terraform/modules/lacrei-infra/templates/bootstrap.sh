@@ -28,11 +28,26 @@ SCRIPTS=(
 )
 
 echo "Downloading scripts from s3://$S3_BUCKET..."
+FAILED_DOWNLOADS=()
 for script in "$${SCRIPTS[@]}"; do
   echo "Downloading $script..."
-  aws s3 cp "s3://$S3_BUCKET/$script" "/tmp/setup-scripts/$script"
-  chmod +x "/tmp/setup-scripts/$script"
+  if aws s3 cp "s3://$S3_BUCKET/$script" "/tmp/setup-scripts/$script"; then
+    chmod +x "/tmp/setup-scripts/$script"
+  else
+    echo "WARNING: Failed to download $script"
+    FAILED_DOWNLOADS+=("$script")
+  fi
 done
+
+if [ $${#FAILED_DOWNLOADS[@]} -gt 0 ]; then
+  echo "WARNING: Some scripts failed to download: $${FAILED_DOWNLOADS[*]}"
+  echo "Retrying failed downloads in 10 seconds..."
+  sleep 10
+  for script in "$${FAILED_DOWNLOADS[@]}"; do
+    echo "Retrying $script..."
+    aws s3 cp "s3://$S3_BUCKET/$script" "/tmp/setup-scripts/$script" && chmod +x "/tmp/setup-scripts/$script"
+  done
+fi
 
 echo "All scripts downloaded successfully"
 echo "=========================================="
