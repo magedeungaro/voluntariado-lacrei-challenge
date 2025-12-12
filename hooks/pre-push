@@ -1,0 +1,106 @@
+#!/bin/bash
+# Pre-push hook to upload changed setup scripts to S3
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}Checking for changed setup scripts before push...${NC}"
+
+# Get the scripts directory path
+SCRIPTS_DIR="terraform/modules/lacrei-infra/scripts"
+
+# Check if scripts directory exists
+if [ ! -d "$SCRIPTS_DIR" ]; then
+    echo -e "${YELLOW}Scripts directory not found, skipping S3 upload${NC}"
+    exit 0
+fi
+
+# Get list of changed script files between local and remote
+# Get the remote and local refs (passed as stdin to pre-push hook)
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        # Branch is being deleted, skip
+        continue
+    fi
+    
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch, check all commits
+        CHANGED_SCRIPTS=$(git diff --name-only --diff-filter=ACM $(git rev-list --max-parents=0 HEAD) $local_sha | grep "^${SCRIPTS_DIR}/.*\.sh$" || true)
+    else
+        # Existing branch, check diff with remote
+        CHANGED_SCRIPTS=$(git diff --name-only --diff-filter=ACM $remote_sha..$local_sha | grep "^${SCRIPTS_DIR}/.*\.sh$" || true)
+    fi
+done
+
+if [ -z "$CHANGED_SCRIPTS" ]; then
+    echo -e "${GREEN}No setup scripts changed, skipping S3 upload${NC}"
+    exit 0
+fi
+
+echo -e "${YELLOW}Changed scripts detected:${NC}"
+echo "$CHANGED_SCRIPTS" | sed 's/^/  - /'
+
+# Check if AWS CLI is available
+if ! command -v aws &> /dev/null; then
+    echo -e "${RED}Error: AWS CLI is not installed${NC}"
+    echo -e "${YELLOW}Install AWS CLI or push with --no-verify to skip this hook${NC}"
+    exit 1
+fi
+
+# Get environment from current branch or default to staging
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$BRANCH" = "main" ]; then
+    ENVIRONMENT="production"
+elif [ "$BRANCH" = "staging" ]; then
+    ENVIRONMENT="staging"
+else
+    echo -e "${YELLOW}Not on main or staging branch, skipping S3 upload${NC}"
+    exit 0
+fi
+
+# S3 bucket name pattern (adjust if needed)
+PROJECT_NAME="lacrei-saude"
+S3_BUCKET="${PROJECT_NAME}-${ENVIRONMENT}-scripts"
+
+echo -e "${YELLOW}Uploading scripts to s3://${S3_BUCKET}...${NC}"
+
+# Check if bucket exists
+if ! aws s3 ls "s3://${S3_BUCKET}" &> /dev/null; then
+    echo -e "${RED}Error: S3 bucket ${S3_BUCKET} does not exist or is not accessible${NC}"
+    echo -e "${YELLOW}Run 'terraform apply' first to create the bucket, or skip with --no-verify${NC}"
+    exit 1
+fi
+
+# Upload each changed script
+UPLOAD_FAILED=0
+for script in $CHANGED_SCRIPTS; do
+    # Get just the filename
+    FILENAME=$(basename "$script")
+    
+    echo -e "${YELLOW}Uploading ${FILENAME}...${NC}"
+    
+    if aws s3 cp "$script" "s3://${S3_BUCKET}/${FILENAME}" --no-progress; then
+        echo -e "${GREEN}✓ Uploaded ${FILENAME}${NC}"
+    else
+        echo -e "${RED}✗ Failed to upload ${FILENAME}${NC}"
+        UPLOAD_FAILED=1
+    fi
+done
+
+if [ $UPLOAD_FAILED -eq 1 ]; then
+    echo -e "${RED}Some scripts failed to upload to S3${NC}"
+    echo -e "${YELLOW}Continue with push anyway? (y/n)${NC}"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Push aborted${NC}"
+        exit 1
+    fi
+fi
+
+echo -e "${GREEN}✓ Script upload complete!${NC}"
+exit 0

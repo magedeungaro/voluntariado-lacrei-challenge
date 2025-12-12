@@ -49,7 +49,50 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 
 ## 🛠️ Stack
 
-Python 3.12 • Django 5.2 • DRF • PostgreSQL 16 • Docker • AWS (EC2, RDS, ECR) • Terraform • GitHub Actions
+Python 3.12 • Django 5.2 • DRF • PostgreSQL 16 • Docker • AWS (EC2, RDS, ECR, S3) • Terraform • GitHub Actions
+
+## 🔧 Development
+
+### Pre-push Hook for Script Updates
+
+The project includes a pre-push hook that automatically uploads changed setup scripts to S3:
+
+```bash
+# Install the pre-push hook
+cp hooks/pre-push .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+```
+
+This hook:
+- Detects changes to scripts in `terraform/modules/lacrei-infra/scripts/`
+- Automatically uploads them to the appropriate S3 bucket (staging or production)
+- Runs before `git push` on `staging` and `main` branches only
+- Can be skipped with `git push --no-verify` if needed
+
+### EC2 User Data Architecture
+
+The infrastructure uses a modular approach for EC2 instance initialization:
+
+1. **Bootstrap Script** (`bootstrap.sh`) - Minimal script uploaded via Terraform
+   - Downloads modular scripts from S3
+   - Executes them in order
+   - Stays under AWS 16KB user_data limit
+
+2. **Modular Scripts** (stored in S3):
+   - `00-init.sh` - Logging setup and initialization
+   - `01-ssm-agent.sh` - SSM agent configuration
+   - `02-system-packages.sh` - Docker, nginx, certbot installation
+   - `03-app-setup.sh` - Application directory and environment setup
+   - `04-nginx-config.sh` - Nginx reverse proxy configuration
+   - `05-deployment-scripts.sh` - Blue/green deployment utilities
+   - `06-ssl-certificates.sh` - SSL certificate management
+   - `99-finalize.sh` - Final checks and logging
+
+This architecture allows:
+- Easy script updates without Terraform changes
+- Bypassing AWS user_data size limits
+- Better organization and maintainability
+- Independent script development and testing
 
 ## 📄 Licença
 

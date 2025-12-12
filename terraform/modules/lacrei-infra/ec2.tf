@@ -15,7 +15,7 @@ resource "aws_instance" "app" {
     delete_on_termination = true
   }
 
-  user_data = base64encode(templatefile("${path.module}/templates/user_data.sh", {
+  user_data = templatefile("${path.module}/templates/bootstrap.sh", {
     aws_region             = var.aws_region
     ecr_repository_url     = local.ecr_repository_url
     db_host                = aws_db_instance.main.address
@@ -23,12 +23,12 @@ resource "aws_instance" "app" {
     db_user                = var.db_user
     db_password            = var.db_password
     django_secret_key      = var.django_secret_key
-    project_name           = var.project_name
     environment            = var.environment
     domain_name            = var.domain_name
     ssl_email              = var.ssl_email
     certificates_s3_bucket = aws_s3_bucket.certificates.bucket
-  }))
+    scripts_s3_bucket      = aws_s3_bucket.scripts.bucket
+  })
 
   metadata_options {
     http_endpoint               = "enabled"
