@@ -37,17 +37,22 @@ jobs:
       
       - name: Check if both CI and Terraform succeeded
         id: check
-        if: github.event_name != 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "✅ Manual dispatch, will deploy"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
           # Get the latest workflow runs for the same commit
           COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
           
           # Check CI status
           CI_STATUS=$(gh run list --workflow=ci.yml --branch=staging --limit 5 --json conclusion,headSha --jq ".[] | select(.headSha==\"$COMMIT_SHA\") | .conclusion" | head -1)
           
-          # Check Terraform status  
+          # Check Terraform status
           TF_STATUS=$(gh run list --workflow=terraform-staging.yml --branch=staging --limit 5 --json conclusion,headSha --jq ".[] | select(.headSha==\"$COMMIT_SHA\") | .conclusion" | head -1)
           
           echo "CI Status: $CI_STATUS"
@@ -59,14 +64,7 @@ jobs:
           else
             echo "⏸️ Waiting for both workflows to succeed"
             echo "should_deploy=false" >> $GITHUB_OUTPUT
-          fi
-      
-      - name: Manual dispatch always deploys
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "should_deploy=true" >> $GITHUB_OUTPUT
-
-  deploy:
+          fi  deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: check-prerequisites
