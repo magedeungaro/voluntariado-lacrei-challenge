@@ -46,18 +46,18 @@ for script in "$${SCRIPTS[@]}"; do
   # Create a temporary script with template variables substituted
   TEMP_SCRIPT="/tmp/setup-scripts/temp-$script"
   cat "/tmp/setup-scripts/$script" | \
-    sed "s|\$${aws_region}|${aws_region}|g" | \
-    sed "s|\$${django_secret_key}|${django_secret_key}|g" | \
-    sed "s|\$${db_name}|${db_name}|g" | \
-    sed "s|\$${db_user}|${db_user}|g" | \
-    sed "s|\$${db_password}|${db_password}|g" | \
-    sed "s|\$${db_host}|${db_host}|g" | \
-    sed "s|\$${domain_name}|${domain_name}|g" | \
-    sed "s|\$${environment}|${environment}|g" | \
-    sed "s|\$${ssl_email}|${ssl_email}|g" | \
-    sed "s|\$${certificates_s3_bucket}|${certificates_s3_bucket}|g" | \
-    sed "s|\$${scripts_s3_bucket}|${scripts_s3_bucket}|g" | \
-    sed "s|\$${ecr_repository_url}|${ecr_repository_url}|g" > "$TEMP_SCRIPT"
+    sed "s|\$\${aws_region}|${aws_region}|g" | \
+    sed "s|\$\${django_secret_key}|${django_secret_key}|g" | \
+    sed "s|\$\${db_name}|${db_name}|g" | \
+    sed "s|\$\${db_user}|${db_user}|g" | \
+    sed "s|\$\${db_password}|${db_password}|g" | \
+    sed "s|\$\${db_host}|${db_host}|g" | \
+    sed "s|\$\${domain_name}|${domain_name}|g" | \
+    sed "s|\$\${environment}|${environment}|g" | \
+    sed "s|\$\${ssl_email}|${ssl_email}|g" | \
+    sed "s|\$\${certificates_s3_bucket}|${certificates_s3_bucket}|g" | \
+    sed "s|\$\${scripts_s3_bucket}|${scripts_s3_bucket}|g" | \
+    sed "s|\$\${ecr_repository_url}|${ecr_repository_url}|g" > "$TEMP_SCRIPT"
   
   chmod +x "$TEMP_SCRIPT"
   

@@ -92,6 +92,17 @@ if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
             fi
         fi
         
+        # Create symlinks to Let's Encrypt certificates for nginx
+        echo "Creating symlinks to Let's Encrypt certificates..."
+        if [ -d "/etc/letsencrypt/live/${domain_name}" ]; then
+            ln -sf "/etc/letsencrypt/live/${domain_name}/fullchain.pem" "/etc/ssl/${domain_name}.crt"
+            ln -sf "/etc/letsencrypt/live/${domain_name}/privkey.pem" "/etc/ssl/${domain_name}.key"
+            ln -sf "/etc/letsencrypt/live/${domain_name}/chain.pem" "/etc/ssl/${domain_name}.ca-bundle"
+            echo "✓ Symlinks created"
+        else
+            echo "Warning: Let's Encrypt certificate directory not found"
+        fi
+        
         # Setup automatic backup cron job for Let's Encrypt
         setup_cert_backup_cron
     fi
