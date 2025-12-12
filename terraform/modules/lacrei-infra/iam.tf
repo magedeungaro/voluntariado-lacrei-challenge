@@ -70,6 +70,31 @@ resource "aws_iam_role_policy" "ec2_cloudwatch" {
   })
 }
 
+# Policy for EC2 to access S3 certificate bucket
+resource "aws_iam_role_policy" "ec2_certificates_s3" {
+  name = "${var.project_name}-${var.environment}-ec2-certificates-s3-policy"
+  role = aws_iam_role.ec2.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.certificates.arn,
+          "${aws_s3_bucket.certificates.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 # Instance Profile
 resource "aws_iam_instance_profile" "ec2" {
   name = "${var.project_name}-${var.environment}-ec2-instance-profile"

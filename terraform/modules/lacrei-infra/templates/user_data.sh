@@ -272,26 +272,107 @@ chmod +x /usr/local/bin/run-migrations.sh
 # Disable default nginx site
 rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
+# Disable default server block in nginx.conf to prevent conflicts
+echo "Disabling default nginx server block..."
+sed -i '/^    server {$/,/^    }$/{s/^/# /}' /etc/nginx/nginx.conf
+
+# Test nginx configuration
+echo "Testing nginx configuration..."
+nginx -t
+
 # Start nginx
 echo "Starting nginx..."
 systemctl start nginx
 echo "Nginx started"
 
+# Certificate backup/restore functions
+S3_CERT_BUCKET="${certificates_s3_bucket}"
+CERT_BACKUP_KEY="letsencrypt-${domain_name}.tar.gz"
+
+backup_certificates() {
+    echo "Backing up certificates to S3..."
+    if [ -d "/etc/letsencrypt" ]; then
+        tar -czf /tmp/letsencrypt-backup.tar.gz -C /etc letsencrypt
+        aws s3 cp /tmp/letsencrypt-backup.tar.gz "s3://$S3_CERT_BUCKET/$CERT_BACKUP_KEY"
+        rm -f /tmp/letsencrypt-backup.tar.gz
+        echo "Certificate backup completed"
+    else
+        echo "No certificates to backup"
+    fi
+}
+
+restore_certificates() {
+    echo "Attempting to restore certificates from S3..."
+    if aws s3 ls "s3://$S3_CERT_BUCKET/$CERT_BACKUP_KEY" 2>/dev/null; then
+        echo "Found existing certificates in S3, restoring..."
+        aws s3 cp "s3://$S3_CERT_BUCKET/$CERT_BACKUP_KEY" /tmp/letsencrypt-backup.tar.gz
+        tar -xzf /tmp/letsencrypt-backup.tar.gz -C /etc/
+        rm -f /tmp/letsencrypt-backup.tar.gz
+        echo "Certificates restored from S3"
+        return 0
+    else
+        echo "No existing certificates found in S3"
+        return 1
+    fi
+}
+
+# Setup cron job for certificate backup (daily)
+setup_cert_backup_cron() {
+    echo "Setting up certificate backup cron job..."
+    cat > /usr/local/bin/backup-certificates.sh << 'BACKUPEOF'
+#!/bin/bash
+S3_CERT_BUCKET="${certificates_s3_bucket}"
+CERT_BACKUP_KEY="letsencrypt-${domain_name}.tar.gz"
+
+if [ -d "/etc/letsencrypt" ]; then
+    tar -czf /tmp/letsencrypt-backup.tar.gz -C /etc letsencrypt
+    aws s3 cp /tmp/letsencrypt-backup.tar.gz "s3://$S3_CERT_BUCKET/$CERT_BACKUP_KEY"
+    rm -f /tmp/letsencrypt-backup.tar.gz
+    logger "SSL certificates backed up to S3"
+fi
+BACKUPEOF
+    chmod +x /usr/local/bin/backup-certificates.sh
+    
+    # Add to crontab (run daily at 3 AM)
+    (crontab -l 2>/dev/null; echo "0 3 * * * /usr/local/bin/backup-certificates.sh") | crontab -
+    echo "Certificate backup cron job configured"
+}
+
 # Get SSL certificate with Certbot
-echo "Obtaining SSL certificate..."
+echo "Managing SSL certificates..."
 if [ ! -z "${domain_name}" ] && [ "${domain_name}" != "_" ]; then
     # Wait for nginx to be ready
     sleep 5
     
-    # Obtain certificate
-    certbot --nginx -d ${domain_name} \
-        --non-interactive \
-        --agree-tos \
-        --email ${ssl_email} \
-        --redirect \
-        --no-eff-email || echo "Failed to obtain SSL certificate. Check DNS configuration."
+    # Try to restore existing certificates first
+    if restore_certificates; then
+        echo "Using restored certificates"
+        # Reload nginx to use restored certificates
+        nginx -t && systemctl reload nginx || echo "Warning: nginx reload failed"
+    else
+        echo "Obtaining new SSL certificate..."
+        
+        # Use staging server for non-production environments to avoid rate limits
+        CERTBOT_FLAGS="--nginx -d ${domain_name} --non-interactive --agree-tos --email ${ssl_email} --redirect --no-eff-email"
+        if [ "${environment}" != "production" ]; then
+            echo "Using Let's Encrypt staging server for ${environment} environment"
+            CERTBOT_FLAGS="$CERTBOT_FLAGS --staging"
+        fi
+        
+        # Obtain certificate
+        if certbot $CERTBOT_FLAGS; then
+            echo "SSL certificate obtained successfully"
+            # Backup the new certificate
+            backup_certificates
+        else
+            echo "Failed to obtain SSL certificate. Check DNS configuration or rate limits."
+        fi
+    fi
     
-    echo "SSL certificate obtained successfully"
+    # Setup automatic backup cron job
+    setup_cert_backup_cron
+    
+    echo "SSL certificate setup completed for ${environment}"
 else
     echo "No domain name configured, skipping SSL setup"
 fi
