@@ -13,7 +13,7 @@ upstream lacrei_backend {
 server {
     listen 80;
     server_name $DOMAIN_NAME;
-    return 301 https://\$host\$request_uri;
+    return 301 https://\$http_host\$request_uri;
 }
 
 # HTTPS server
@@ -34,17 +34,17 @@ server {
 
     location / {
         proxy_pass http://lacrei_backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$http_host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_connect_timeout 30s;
         proxy_read_timeout 30s;
     }
 
     location /api/v1/health/ {
         proxy_pass http://lacrei_backend;
-        proxy_set_header Host $host;
+        proxy_set_header Host \$http_host;
     }
 
     # Static files (if needed)
