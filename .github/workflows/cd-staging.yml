@@ -26,12 +26,52 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
+  check-prerequisites:
+    name: Check Prerequisites
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check if both CI and Terraform succeeded
+        id: check
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get the latest workflow runs for the same commit
+          COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+          
+          # Check CI status
+          CI_STATUS=$(gh run list --workflow=ci.yml --branch=staging --limit 5 --json conclusion,headSha --jq ".[] | select(.headSha==\"$COMMIT_SHA\") | .conclusion" | head -1)
+          
+          # Check Terraform status  
+          TF_STATUS=$(gh run list --workflow=terraform-staging.yml --branch=staging --limit 5 --json conclusion,headSha --jq ".[] | select(.headSha==\"$COMMIT_SHA\") | .conclusion" | head -1)
+          
+          echo "CI Status: $CI_STATUS"
+          echo "Terraform Status: $TF_STATUS"
+          
+          if [ "$CI_STATUS" = "success" ] && [ "$TF_STATUS" = "success" ]; then
+            echo "✅ Both CI and Terraform succeeded, will deploy"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "⏸️ Waiting for both workflows to succeed"
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Manual dispatch always deploys
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
+    needs: check-prerequisites
+    if: ${{ needs.check-prerequisites.outputs.should_deploy == 'true' }}
     environment: staging
-    # Only run if CI succeeded on staging branch (or if manually triggered)
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'staging') }}
     
     steps:
       - uses: actions/checkout@v4
