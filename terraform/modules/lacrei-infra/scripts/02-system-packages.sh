@@ -32,5 +32,12 @@ echo "Installing AWS CLI..."
 dnf install -y aws-cli
 echo "AWS CLI installed"
 
+# Install cron
+echo "Installing cronie..."
+dnf install -y cronie
+systemctl enable crond
+systemctl start crond
+echo "Cron installed and started"
+
 # Add ec2-user to docker group
 usermod -aG docker ec2-user
