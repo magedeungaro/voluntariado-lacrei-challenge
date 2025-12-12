@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Source environment variables
+source /etc/lacrei-env.sh
+
 # Find the currently running container
 RUNNING_CONTAINER=$(docker ps --format '{{.Names}}' | grep -E 'lacrei-(blue|green)' | head -1)
 
