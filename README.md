@@ -34,6 +34,8 @@ open http://localhost:8000/api/docs/
 | Production | `https://api.magenifica.dev` | `release` |
 | Staging | `https://api-stg.magenifica.dev` | `staging` |
 
+> **Nota:** O ambiente de staging utiliza um certificado de teste do Let's Encrypt (staging) por questões de custo e limites de emissão. Esse certificado não é confiável para navegadores e exibirá um aviso de segurança (`ERR_CERT_AUTHORITY_INVALID`). Isso é intencional para fins de teste e não afeta o ambiente de produção, que utiliza um certificado válido e confiável.
+
 ## 🔑 Quick API Test
 
 ```bash
