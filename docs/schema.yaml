@@ -1,0 +1,709 @@
+openapi: 3.0.3
+info:
+  title: Lacrei Saúde API
+  version: 1.0.0
+  description: API REST para gerenciamento de profissionais de saúde e consultas
+paths:
+  /api/v1/appointments/:
+    get:
+      operationId: v1_appointments_list
+      description: Retorna uma lista paginada de todas as consultas. Pode ser filtrada
+        pelo parâmetro professional_uuid.
+      summary: Listar consultas
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      - in: query
+        name: professional_uuid
+        schema:
+          type: string
+        description: Filtrar consultas pelo UUID do profissional
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - read
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentDetailList'
+          description: ''
+    post:
+      operationId: v1_appointments_create
+      description: Cria uma nova consulta vinculada a um profissional.
+      summary: Criar consulta
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+        required: true
+      security:
+      - oauth2:
+        - write
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{uuid}/:
+    get:
+      operationId: v1_appointments_retrieve
+      description: Retorna os detalhes de uma consulta específica com informações
+        do profissional.
+      summary: Obter detalhes da consulta
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - read
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentDetail'
+          description: ''
+    put:
+      operationId: v1_appointments_update
+      description: Atualiza todos os campos de uma consulta.
+      summary: Atualizar consulta
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+        required: true
+      security:
+      - oauth2:
+        - write
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    patch:
+      operationId: v1_appointments_partial_update
+      description: Atualiza campos específicos de uma consulta.
+      summary: Atualizar parcialmente consulta
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointmentRequest'
+      security:
+      - oauth2:
+        - write
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    delete:
+      operationId: v1_appointments_destroy
+      description: Exclui uma consulta.
+      summary: Excluir consulta
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - write
+      responses:
+        '204':
+          description: No response body
+  /api/v1/professionals/:
+    get:
+      operationId: v1_professionals_list
+      description: Retorna uma lista paginada de todos os profissionais de saúde.
+      summary: Listar profissionais
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Um número de página dentro do conjunto de resultados paginado.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - read
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProfessionalList'
+          description: ''
+    post:
+      operationId: v1_professionals_create
+      description: Cria um novo profissional de saúde com endereço e contatos.
+      summary: Criar profissional
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfessionalRequest'
+        required: true
+      security:
+      - oauth2:
+        - write
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Professional'
+          description: ''
+  /api/v1/professionals/{uuid}/:
+    get:
+      operationId: v1_professionals_retrieve
+      description: Retorna os detalhes de um profissional de saúde específico.
+      summary: Obter detalhes do profissional
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - read
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfessionalDetail'
+          description: ''
+    put:
+      operationId: v1_professionals_update
+      description: Atualiza todos os campos de um profissional de saúde.
+      summary: Atualizar profissional
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfessionalRequest'
+        required: true
+      security:
+      - oauth2:
+        - write
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Professional'
+          description: ''
+    patch:
+      operationId: v1_professionals_partial_update
+      description: Atualiza campos específicos de um profissional de saúde.
+      summary: Atualizar parcialmente profissional
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfessionalRequest'
+      security:
+      - oauth2:
+        - write
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Professional'
+          description: ''
+    delete:
+      operationId: v1_professionals_destroy
+      description: Exclui um profissional de saúde.
+      summary: Excluir profissional
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - oauth2:
+        - write
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Address:
+      type: object
+      description: Serializador para o modelo de Endereço.
+      properties:
+        street:
+          type: string
+          title: Rua
+          description: Nome da rua/logradouro
+          maxLength: 255
+        number:
+          type: string
+          nullable: true
+          title: Número
+          description: Número do endereço
+          maxLength: 255
+        neighborhood:
+          type: string
+          nullable: true
+          title: Bairro
+          description: Bairro
+          maxLength: 255
+        complement:
+          type: string
+          nullable: true
+          title: Complemento
+          description: 'Complemento do endereço (ex: Apto 101, Bloco B)'
+          maxLength: 255
+        city:
+          type: string
+          title: Cidade
+          description: Nome da cidade
+          maxLength: 255
+        state:
+          type: string
+          title: Estado
+          description: Nome ou sigla do estado
+          maxLength: 255
+        zip_code:
+          type: string
+          title: CEP
+          description: CEP com 8 dígitos (apenas números)
+          pattern: ^\d{8}$
+          maxLength: 8
+      required:
+      - city
+      - state
+      - street
+      - zip_code
+    AddressRequest:
+      type: object
+      description: Serializador para o modelo de Endereço.
+      properties:
+        street:
+          type: string
+          minLength: 1
+          title: Rua
+          description: Nome da rua/logradouro
+          maxLength: 255
+        number:
+          type: string
+          nullable: true
+          title: Número
+          description: Número do endereço
+          maxLength: 255
+        neighborhood:
+          type: string
+          nullable: true
+          title: Bairro
+          description: Bairro
+          maxLength: 255
+        complement:
+          type: string
+          nullable: true
+          title: Complemento
+          description: 'Complemento do endereço (ex: Apto 101, Bloco B)'
+          maxLength: 255
+        city:
+          type: string
+          minLength: 1
+          title: Cidade
+          description: Nome da cidade
+          maxLength: 255
+        state:
+          type: string
+          minLength: 1
+          title: Estado
+          description: Nome ou sigla do estado
+          maxLength: 255
+        zip_code:
+          type: string
+          minLength: 1
+          title: CEP
+          description: CEP com 8 dígitos (apenas números)
+          pattern: ^\d{8}$
+          maxLength: 8
+      required:
+      - city
+      - state
+      - street
+      - zip_code
+    Appointment:
+      type: object
+      description: Serializador para o modelo de Consulta.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        date:
+          type: string
+          format: date-time
+          title: Data da Consulta
+          description: Data e horário da consulta
+        professional_uuid:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - date
+      - professional_uuid
+      - updated_at
+      - uuid
+    AppointmentDetail:
+      type: object
+      description: Serializador para Consulta com detalhes do Profissional.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        date:
+          type: string
+          format: date-time
+          title: Data da Consulta
+          description: Data e horário da consulta
+        professional:
+          allOf:
+          - $ref: '#/components/schemas/Professional'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - date
+      - professional
+      - updated_at
+      - uuid
+    AppointmentRequest:
+      type: object
+      description: Serializador para o modelo de Consulta.
+      properties:
+        date:
+          type: string
+          format: date-time
+          title: Data da Consulta
+          description: Data e horário da consulta
+        professional_uuid:
+          type: string
+          format: uuid
+      required:
+      - date
+      - professional_uuid
+    Contact:
+      type: object
+      description: Serializador para o modelo de Contato.
+      properties:
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/KindEnum'
+          title: Tipo
+          description: |-
+            Tipo de contato (whatsapp, celular, telefone, e-mail, linkedin)
+
+            * `whatsapp` - WhatsApp
+            * `mobile` - Celular
+            * `phone` - Telefone
+            * `email` - E-mail
+            * `linkedin` - LinkedIn
+        value:
+          type: string
+          title: Valor
+          description: Valor do contato (número, endereço de e-mail, URL, etc.)
+          maxLength: 255
+      required:
+      - kind
+      - value
+    ContactRequest:
+      type: object
+      description: Serializador para o modelo de Contato.
+      properties:
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/KindEnum'
+          title: Tipo
+          description: |-
+            Tipo de contato (whatsapp, celular, telefone, e-mail, linkedin)
+
+            * `whatsapp` - WhatsApp
+            * `mobile` - Celular
+            * `phone` - Telefone
+            * `email` - E-mail
+            * `linkedin` - LinkedIn
+        value:
+          type: string
+          minLength: 1
+          title: Valor
+          description: Valor do contato (número, endereço de e-mail, URL, etc.)
+          maxLength: 255
+      required:
+      - kind
+      - value
+    KindEnum:
+      enum:
+      - whatsapp
+      - mobile
+      - phone
+      - email
+      - linkedin
+      type: string
+      description: |-
+        * `whatsapp` - WhatsApp
+        * `mobile` - Celular
+        * `phone` - Telefone
+        * `email` - E-mail
+        * `linkedin` - LinkedIn
+    PaginatedAppointmentDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDetail'
+    PaginatedProfessionalList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Professional'
+    PatchedAppointmentRequest:
+      type: object
+      description: Serializador para o modelo de Consulta.
+      properties:
+        date:
+          type: string
+          format: date-time
+          title: Data da Consulta
+          description: Data e horário da consulta
+        professional_uuid:
+          type: string
+          format: uuid
+    PatchedProfessionalRequest:
+      type: object
+      description: Serializador para o modelo de Profissional de Saúde (lista e escrita).
+      properties:
+        social_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        profession:
+          type: string
+          minLength: 1
+          maxLength: 255
+        address:
+          allOf:
+          - $ref: '#/components/schemas/AddressRequest'
+          writeOnly: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactRequest'
+    Professional:
+      type: object
+      description: Serializador para o modelo de Profissional de Saúde (lista e escrita).
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        social_name:
+          type: string
+          maxLength: 255
+        profession:
+          type: string
+          maxLength: 255
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+      required:
+      - contacts
+      - profession
+      - social_name
+      - uuid
+    ProfessionalDetail:
+      type: object
+      description: Serializador para detalhes do Profissional (retrieve).
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        social_name:
+          type: string
+          maxLength: 255
+        profession:
+          type: string
+          maxLength: 255
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contacts
+      - created_at
+      - profession
+      - social_name
+      - updated_at
+      - uuid
+    ProfessionalRequest:
+      type: object
+      description: Serializador para o modelo de Profissional de Saúde (lista e escrita).
+      properties:
+        social_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        profession:
+          type: string
+          minLength: 1
+          maxLength: 255
+        address:
+          allOf:
+          - $ref: '#/components/schemas/AddressRequest'
+          writeOnly: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactRequest'
+      required:
+      - address
+      - contacts
+      - profession
+      - social_name
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows: {}
