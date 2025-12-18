@@ -1,4 +1,4 @@
-# Segurança e Autenticação - Lacrei Saúde API
+# Segurança e Autenticação
 
 Este documento descreve a estratégia de segurança e autenticação implementada na API, incluindo configurações, rotas protegidas e boas práticas.
 
