@@ -1,4 +1,4 @@
-# Getting Started
+# Primeiros Passos
 
 ## Stack Tecnológica
 

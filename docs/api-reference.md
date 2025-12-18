@@ -1,4 +1,4 @@
-# Referência da API - Lacrei Saúde
+# Referência da API
 
 Documentação completa dos endpoints da API REST para gerenciamento de profissionais de saúde e consultas.
 

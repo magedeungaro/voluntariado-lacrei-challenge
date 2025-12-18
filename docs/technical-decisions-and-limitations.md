@@ -1,4 +1,4 @@
-# Decisões Técnicas e Arquitetura - Lacrei Saúde API
+# Decisões Técnicas e Limitações
 
 Este documento registra as decisões técnicas relevantes tomadas durante o desenvolvimento do projeto, suas justificativas e trade-offs, além de limitações conhecidas e possíveis melhorias futuras.
 

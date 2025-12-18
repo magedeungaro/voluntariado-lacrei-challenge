@@ -1,4 +1,4 @@
-# Guia de Testes - Lacrei Saúde API
+# Testes
 
 Este documento descreve a estratégia de testes automatizados da API, incluindo como configurar o ambiente e executar os testes.
 
